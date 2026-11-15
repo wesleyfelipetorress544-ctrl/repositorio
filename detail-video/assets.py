@@ -1,59 +1,65 @@
 #!/usr/bin/env python3
-"""Frame grabs tied to genuine Reddit-discovered GTA VI easter eggs in Rockstar trailers."""
-import re,urllib.request,urllib.parse,html,pathlib
-ROOT=pathlib.Path("public");ROOT.mkdir(exist_ok=True)
+"""Real GTA VI trailer frames + official 2022 Rockstar Tommy Vercetti tribute art.
+Prefer 1080p official YouTube source; gracefully fall back to indexed real trailer stills.
+"""
+import re,urllib.request,urllib.parse,html,pathlib,subprocess,os,glob
+P=pathlib.Path("public");P.mkdir(exist_ok=True)
 H={"User-Agent":"Mozilla/5.0 Chrome/126 Safari/537.36"}
-def fetch(u):return urllib.request.urlopen(urllib.request.Request(u,headers=H),timeout=35).read()
+def fetch(u):
+ return urllib.request.urlopen(urllib.request.Request(u,headers=H),timeout=45).read()
+def run(*args):
+ return subprocess.run(args,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)
+shots=[(2,33.0,'Tommy shirt lizard in shop'),(2,127.0,'RDR2 presidents on banknotes'),(2,134.0,"Phil's Ammu-Nation TV"),(1,77.0,'Petty Forever sticker'),(2,11.3,'Jason fixing leaks')]
 pages={}
-for which in (1,2):
- url=f"https://leonidabay.com/en/trailers/trailer-{which}"
+for n in (1,2):
+ url=f"https://leonidabay.com/en/trailers/trailer-{n}"
  raw=fetch(url).decode("utf-8","replace")
- pairs=[(float(s),html.unescape(src)) for s,src in re.findall(r'<a href="\?t=\d+#reproductor" data-seek="([\d.]+)"[^>]*>\s*<img src="([^"]+)"',raw,re.S)]
- assert len(pairs)>30,f"No archive frames for trailer {which}"
- pages[which]=(url,pairs)
- print(f"Trailer {which} indexed {len(pairs)} real frames",flush=True)
-
-# Frame target, from indexed fan analysis of the original Rockstar videos. The
-# commentary distinguishes interpretation from visually verified imagery.
-shots=[
- (2,33.0,"Iguana painting in shop with shirt resembling Tommy Vercetti"),
- (2,127.0,"Hardin and Waxman RDR2 presidents printed on GTA VI club banknotes"),
- (2,134.0,"Phil's Ammu-Nation advert with mullet presenter"),
- (1,77.0,"Petty Forever memorial sticker on store door"),
- (2,11.3,"Jason fixing the roof leaks, possible nod to GTA VI 2022 leaks"),
+ matches=[(float(t),html.unescape(src)) for t,src in re.findall(r'<a href="\\?t=\\d+#reproductor" data-seek="([\\d.]+)"[^>]*>\\s*<img src="([^"]+)"',raw,re.S)]
+ assert len(matches)>=25, f"Indexed real trailer frames unavailable for trailer {n}"
+ pages[n]=(url,matches)
+ print("TRAILER INDEX",n,len(matches),flush=True)
+# Download official Rockstar tribute artwork featuring Tommy's original Hawaiian shirt
+art=[
+ "https://pbs.twimg.com/media/FTtB1EEX0AAExKL?format=jpg&name=large",
+ "https://pbs.twimg.com/media/FTtB1EEX0AAExKL.jpg",
 ]
-for i,(which,sec,label) in enumerate(shots):
- url,pairs=pages[which]
- nearest=min(pairs,key=lambda p:abs(p[0]-sec))
- assert abs(nearest[0]-sec)<3.6,f"Cannot map trailer {which} timestamp {sec} to source frame"
- data=fetch(urllib.parse.urljoin(url,nearest[1]))
- assert len(data)>2000
- p=ROOT/f"scene{i}.webp";p.write_bytes(data)
- print(f"{i+1}: trailer={which} frame={nearest[0]} caption={label} bytes={len(data)}",flush=True)
-poster=ROOT/"poster.webp"
-poster.write_bytes(fetch(urllib.parse.urljoin(pages[2][0],"/trailers/trailer2/poster.webp")))
-print("Five source-specific trailer frames downloaded",flush=True)
+for src in art:
+ try:
+  data=fetch(src)
+  if len(data)>12000:
+   (P/"tommy.jpg").write_bytes(data);print("TOMMY_OFFICIAL_REFERENCE",len(data),src,flush=True);break
+ except Exception as e: print("Tommy source fallback",str(e)[:100],flush=True)
+assert (P/"tommy.jpg").exists(),"Cannot make the Tommy comparison without verified original Rockstar artwork."
 
-# Dedicated closeups when available: real GTA VI screenshots, not AI-generated images.
-# Also prepare a focus still for each item so the Remotion close-up transition
-# always shows exactly the referenced game's own image.
-import subprocess
-closeups={
-  1:"https://rockstarintel.com/wp-content/uploads/2025/05/Vice_City_07-Copy.jpg",
-  2:"https://image.thenerdstash.com/2025/05/phil-gta.jpg",
+# Try full resolution Rockstar trailers first. Never fake the source imagery.
+video_urls={
+ 1:"https://www.youtube.com/watch?v=QdBZY2fkU-0",
+ 2:"https://www.youtube.com/watch?v=VQRLujxTm3c",
 }
-for i in range(5):
-    target=ROOT/f"close{i}.jpg"
-    if i in closeups:
-        try:
-            data=fetch(closeups[i])
-            if len(data)>4000:
-                temp=ROOT/f"extra{i}.dat";temp.write_bytes(data)
-                subprocess.run(["ffmpeg","-y","-loglevel","error","-i",str(temp),"-frames:v","1",str(target)],check=True)
-                temp.unlink()
-                print("Specialized real-photo closeup",i,len(data),flush=True)
-                continue
-        except Exception as e:
-            print("Closeup source unavailable; using official trailer frame",i,str(e)[:160],flush=True)
-    subprocess.run(["ffmpeg","-y","-loglevel","error","-i",str(ROOT/f"scene{i}.webp"),"-frames:v","1",str(target)],check=True)
-    print("Closeup from actual trailer frame",i,flush=True)
+for n in (1,2):
+ if not any(k==n for k,_,_ in shots): continue
+ path=f"trailer{n}.mp4"
+ result=run("yt-dlp","--no-playlist","--socket-timeout","18","--retries","1",
+            "-f","best[height<=1080][ext=mp4]/best[height<=1080]/best","-o",path,video_urls[n])
+ if result.returncode!=0 or not pathlib.Path(path).exists():
+  print("HD trailer unavailable; use authentic indexed frame",n,result.stderr[-280:],flush=True)
+  continue
+ print("HD trailer downloaded",n,os.stat(path).st_size,flush=True)
+
+for i,(n,t,label) in enumerate(shots):
+ out=P/f"scene{i}.jpg"
+ path=f"trailer{n}.mp4"
+ if pathlib.Path(path).exists():
+  result=run("ffmpeg","-y","-loglevel","error","-ss",str(t),"-i",path,"-frames:v","1","-q:v","2",str(out))
+  if result.returncode==0 and out.exists() and out.stat().st_size>12000:
+   print("HD SOURCE",i,label,out.stat().st_size,flush=True);continue
+ url,matches=pages[n]
+ best=min(matches,key=lambda item:abs(item[0]-t))
+ assert abs(best[0]-t)<=3.6, f"Wrong scene frame: {n} {t}"
+ original=fetch(urllib.parse.urljoin(url,best[1]))
+ source=P/f"fallback{i}.webp";source.write_bytes(original)
+ subprocess.run(["ffmpeg","-y","-loglevel","error","-i",str(source),"-frames:v","1","-q:v","2",str(out)],check=True)
+ print("AUTHENTIC TRAILER STILL",i,best[0],out.stat().st_size,flush=True)
+(P/"poster.webp").write_bytes(fetch(urllib.parse.urljoin(pages[2][0],"/trailers/trailer2/poster.webp")))
+for i in range(5): assert (P/f"scene{i}.jpg").stat().st_size>2000
+print("Verified five scene images plus original Tommy reference",flush=True)

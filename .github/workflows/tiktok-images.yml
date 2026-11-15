@@ -1,0 +1,29 @@
+name: Inspect nine images of GTA VI TikTok reference
+on:
+  push:
+    branches: [gta6-tiktok-photo-reference-2026]
+    paths: ['tiktok-reference/images.py','.github/workflows/tiktok-images.yml']
+  pull_request:
+    branches: [main]
+    paths: ['tiktok-reference/images.py','.github/workflows/tiktok-images.yml']
+permissions:
+  contents: write
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build visual contact sheet of linked TikTok
+        run: |
+          python -m pip install requests pillow --break-system-packages -q
+          python tiktok-reference/images.py
+      - name: Store contact sheet for visual review
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import json,base64
+          data=base64.b64encode(open('tiktok-reference/contact-sheet.jpg','rb').read()).decode()
+          open('payload.json','w').write(json.dumps({'message':'Inspect nine reference frames','content':data,'branch':'gta6-tiktok-photo-reference-2026'}))
+          PY
+          gh api -X PUT "repos/${{ github.repository }}/contents/tiktok-reference/contact-sheet.jpg" --input payload.json

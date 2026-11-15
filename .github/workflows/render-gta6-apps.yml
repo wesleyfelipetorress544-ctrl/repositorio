@@ -1,0 +1,70 @@
+name: Render GTA VI apps without disclaimer
+on:
+  push:
+    branches: [gta6-tiktok-photo-reference-2026]
+    paths:
+      - 'gta6-apps-video/**'
+      - '.github/workflows/render-gta6-apps.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'gta6-apps-video/**'
+      - '.github/workflows/render-gta6-apps.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: gta6-apps-video
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install rendering tools
+        run: |
+          npm install --no-audit --no-fund
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg unzip
+          npx remotion browser ensure
+      - name: Download Rockstar imagery and original Pricedown
+        run: |
+          mkdir -p public
+          curl -fLsS --retry 3 'https://media-rockstargames-com.akamaized.net/rockstargames-newsite/img/global/downloads/wallpapers/games/vi/Jason_and_Lucia_01/Jason_and_Lucia_01_landscape.jpg' -o public/vice1.jpg
+          cp public/vice1.jpg public/vice2.jpg
+          curl -fLsS --retry 3 'https://dl.dafont.com/dl/?f=pricedown' -o pricedown.zip
+          unzip -po pricedown.zip 'Pricedown Bl.otf' > public/pricedown.otf
+          test -s public/vice1.jpg
+          test -s public/pricedown.otf
+      - name: Generate soundtrack and Portuguese narration
+        run: |
+          node music.cjs
+          python -m pip install edge-tts --break-system-packages
+          python narration.py
+      - name: Validate composition
+        run: npx remotion compositions src/index.jsx
+      - name: Render vertical 40-second 60fps MP4
+        run: npx remotion render src/index.jsx GTA6Apps gta6-aplicativos-celular.mp4 --codec h264 --concurrency 2 --log error --timeout 180000
+      - name: Verify media streams and duration
+        run: |
+          ffprobe -v error -show_entries format=duration,size:stream=codec_type,codec_name,width,height,r_frame_rate -of json gta6-aplicativos-celular.mp4
+          ffmpeg -hide_banner -i gta6-aplicativos-celular.mp4 -map 0:a:0 -af volumedetect -f null - 2>&1 | grep -E 'mean_volume|max_volume'
+          test -s gta6-aplicativos-celular.mp4
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gta6-aplicativos-celular-mp4
+          path: gta6-apps-video/gta6-aplicativos-celular.mp4
+          retention-days: 7
+      - name: Publish direct MP4 download
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view gta6-aplicativos-sem-observacao-2026 --repo ${{ github.repository }} >/dev/null 2>&1; then
+            gh release upload gta6-aplicativos-sem-observacao-2026 gta6-aplicativos-celular.mp4 --repo ${{ github.repository }} --clobber
+          else
+            gh release create gta6-aplicativos-sem-observacao-2026 gta6-aplicativos-celular.mp4 --repo ${{ github.repository }} --target gta6-tiktok-photo-reference-2026 --title 'GTA VI - Aplicativos do celular' --notes 'Original Remotion animated explainer based on TikTok photo carousel, 40s vertical 60fps, Portuguese narration, original music. Names and descriptions come from a fan-made reference, not confirmed gameplay features.'
+          fi

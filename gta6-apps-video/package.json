@@ -1,0 +1,13 @@
+{
+  "name": "gta6-apps-tiktok-style",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@remotion/cli": "4.0.543",
+    "remotion": "4.0.543",
+    "react": "19.1.1",
+    "react-dom": "19.1.1",
+    "lucide-react": "0.468.0"
+  }
+}

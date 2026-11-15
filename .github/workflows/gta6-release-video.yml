@@ -1,0 +1,65 @@
+name: Render GTA VI launch reaction video
+on:
+  push:
+    branches: [gta6-lancamento-short]
+    paths:
+      - 'gta6-launch/**'
+      - '.github/workflows/gta6-release-video.yml'
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: gta6-launch
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install video dependencies
+        run: |
+          npm install --no-audit --no-fund
+          sudo apt-get update -qq
+          sudo apt-get install -y unzip ffmpeg
+          npx remotion browser ensure
+      - name: Download Rockstar official art and licensed Pricedown font
+        run: |
+          mkdir -p public
+          curl -fLsS --retry 3 'https://media-rockstargames-com.akamaized.net/rockstargames-newsite/img/global/downloads/wallpapers/games/vi/Jason_and_Lucia_01/Jason_and_Lucia_01_landscape.jpg' -o public/official.jpg
+          curl -fLsS --retry 3 'https://dl.dafont.com/dl/?f=pricedown' -o pricedown.zip
+          unzip -po pricedown.zip 'Pricedown Bl.otf' > public/pricedown.otf
+          test -s public/official.jpg
+          test -s public/pricedown.otf
+      - name: Generate soundtrack and narration
+        run: |
+          node music.cjs
+          python -m pip install edge-tts --break-system-packages
+          python voice.py
+      - name: Validate Remotion composition
+        run: npx remotion compositions src/index.jsx
+      - name: Render 30 second 60 FPS MP4
+        run: npx remotion render src/index.jsx GTA6Launch gta6-como-sera-quando-sair.mp4 --codec h264 --concurrency 2 --log error --timeout 180000
+      - name: Verify audio, video and duration
+        run: |
+          ffprobe -v error -show_entries stream=codec_type,codec_name,width,height,r_frame_rate -of json gta6-como-sera-quando-sair.mp4
+          test -s gta6-como-sera-quando-sair.mp4
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gta6-lancamento-video-mp4
+          path: gta6-launch/gta6-como-sera-quando-sair.mp4
+          retention-days: 7
+      - name: Publish MP4 download
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view gta6-como-sera-lancamento-2026 --repo ${{ github.repository }} >/dev/null 2>&1; then
+            gh release upload gta6-como-sera-lancamento-2026 gta6-como-sera-quando-sair.mp4 --repo ${{ github.repository }} --clobber
+          else
+            gh release create gta6-como-sera-lancamento-2026 gta6-como-sera-quando-sair.mp4 --repo ${{ github.repository }} --target gta6-lancamento-short --title 'Como sera quando GTA VI sair' --notes 'Short vertical de 30 segundos a 60 FPS, com narracao brasileira, fonte Pricedown e trilha original. As reacoes sao previsoes.'
+          fi

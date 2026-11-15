@@ -6,16 +6,16 @@ const options={extrapolateLeft:'clamp',extrapolateRight:'clamp'};
 const lerp=(f,a,b)=>interpolate(f,[a,b],[0,1],options);
 const ease=(f,a,b)=>Easing.out(Easing.cubic)(lerp(f,a,b));
 const data=[
- {title:'TELHADO DE JASON',small:'Ele conserta a própria casa',time:'0:11',focus:49},
- {title:'PICAPE DE BRIAN',small:'Brian chega de caminhonete',time:'0:09',focus:50},
- {title:'PLACAS DO AEROPORTO',small:'Rumo a Vice City',time:'0:34',focus:49},
- {title:'ACADEMIA NA PRAIA',small:'Musculação ao ar livre',time:'0:38',focus:55},
- {title:'BLITZ POLICIAL',small:'Barreiras nas ruas',time:'0:45',focus:45},
- {title:'SAÍDA DA PRISÃO',small:'Lucia é libertada',time:'1:03',focus:53},
- {title:'MARINA DO BRIAN',small:'Placa na oficina de barcos',time:'1:25',focus:52},
- {title:'SELFIE NA BOATE',small:'Noite de Vice City',time:'2:04',focus:47},
- {title:'HELICÓPTERO NO PÂNTANO',small:'Perseguição em Grassrivers',time:'2:18',focus:50},
- {title:'ONDAS NA AVENIDA',small:'O mar invade a pista',time:'2:32',focus:50},
+ {title:'A CAMISA DE TOMMY',small:'Iguana atrás do balcão • referência dos fãs',time:'T2 · 0:33',focus:70,kind:'REFERÊNCIA'},
+ {title:'RED DEAD NAS NOTAS',small:'Hardin e Waxman aparecem no dinheiro',time:'T2 · 2:07',focus:50,kind:'EASTER EGG'},
+ {title:'PHIL CASSIDY?',small:'Comercial de Phil\'s Ammu-Nation',time:'T2 · 2:09',focus:55,kind:'TEORIA'},
+ {title:'V-ROCK DE VOLTA?',small:'Jason usa referência à rádio de Vice City',time:'T2 · CENA',focus:50,kind:'REFERÊNCIA'},
+ {title:'A PIADA DOS LEAKS',small:'Jason diz que está consertando vazamentos',time:'T2 · 0:11',focus:50,kind:'TEORIA'},
+ {title:'LIBERDADE, LUCIA!',small:'Camiseta “Let Freedom Reign” na prisão',time:'T2 · 1:00',focus:50,kind:'IRONIA'},
+ {title:'METRÔ ESCONDIDO',small:'Linha elevada atrás da blitz policial',time:'T2 · 0:45',focus:50,kind:'DETALHE'},
+ {title:'HOTEL OCEAN VIEW',small:'O clássico refúgio de Tommy em Vice City',time:'T1 · 0:32',focus:50,kind:'REFERÊNCIA'},
+ {title:'RED DEAD NO GTA?',small:'Adesivo lembra o fora da lei Everett Morgan',time:'T1 · 1:16',focus:50,kind:'REFERÊNCIA'},
+ {title:'HOMENAGEM A PETTY?',small:'Adesivo visto perto do fim do Trailer 1',time:'T1 · 1:16',focus:50,kind:'TEORIA'},
 ];
 
 const Type=({children,size=84,color=WHITE,style={}})=><div style={{fontFamily:F,fontSize:size,color,lineHeight:1.01,textShadow:'0 5px 0 rgba(0,0,0,.52)',...style}}>{children}</div>;
@@ -33,10 +33,10 @@ const Intro=()=>{const f=useCurrentFrame(),p=ease(f,6,34);return <AbsoluteFill s
  <Bg img='poster.webp' f={f}/>
  <div style={{position:'absolute',top:105,left:44,right:44}}><Label>ROCKSTAR GAMES · TRAILER 2</Label></div>
  <div style={{position:'absolute',top:330,left:32,right:32,textAlign:'center',transform:`translateY(${(1-p)*100}px) scale(${.85+.15*p})`,opacity:p}}>
- <Type size={110}>10 DETALHES</Type><Type size={128} color={ORANGE}>QUE VOCÊ</Type><Type size={113}>NÃO NOTOU</Type>
+ <Type size={110}>10 EASTER EGGS</Type><Type size={128} color={ORANGE}>QUE OS FÃS</Type><Type size={113}>ENCONTRARAM</Type>
  <div style={{marginTop:35,font:'bold 29px Arial',letterSpacing:3}}>GTA VI</div>
  </div>
- <div style={{position:'absolute',top:920,left:40,right:40,font:'bold 22px Arial',textAlign:'center',letterSpacing:1,color:'#FFE7EF'}}>TODOS VISÍVEIS NO TRAILER OFICIAL</div>
+ <div style={{position:'absolute',top:920,left:40,right:40,font:'bold 22px Arial',textAlign:'center',letterSpacing:1,color:'#FFE7EF'}}>REFERÊNCIAS E TEORIAS DOS TRAILERS 1 E 2</div>
  <Pulse f={f}/><Bar frame={f} total={150}/>
  </AbsoluteFill>};
 const Detail=({id})=>{
@@ -46,7 +46,7 @@ const Detail=({id})=>{
  return <AbsoluteFill style={{background:'#0A0615',color:WHITE}}>
    <Bg img={`scene${id}.webp`} f={f}/>
    <div style={{position:'absolute',top:90,left:40,right:40,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-     <Label>TRAILER 2</Label><div style={{fontFamily:F,fontSize:37,color:'#FFC487'}}>{it.time}</div>
+     <Label>{it.kind}</Label><div style={{fontFamily:F,fontSize:37,color:'#FFC487'}}>{it.time}</div>
    </div>
    <div style={{position:'absolute',top:178,left:37,right:37,fontFamily:F,fontSize:130,lineHeight:1,color:'#FFAB6D',opacity:reveal,transform:`translateY(${(1-reveal)*50}px)`}}>
      {String(id+1).padStart(2,'0')} <span style={{fontSize:50,color:'rgba(255,255,255,.8)'}}>/ 10</span>
@@ -58,7 +58,7 @@ const Detail=({id})=>{
       <div style={{position:'absolute',right:18,top:18,background:'#0009',padding:'7px 12px',font:'bold 16px Arial',letterSpacing:1,borderRadius:5}}>FRAME REAL</div>
    </div>
    <div style={{position:'absolute',top:866,left:34,right:34,opacity:late,transform:`translateY(${(1-late)*65}px)`}}>
-      <Type size={id===8?61:id===2?65:72} color={WHITE} style={{textAlign:'center'}}>{it.title}</Type>
+      <Type size={id===8?67:id===2?70:72} color={WHITE} style={{textAlign:'center'}}>{it.title}</Type>
       <div style={{marginTop:24,textAlign:'center',font:'600 29px Arial',color:'#FBCBE3'}}>{it.small}</div>
    </div>
    <Pulse f={f}/>
@@ -72,12 +72,12 @@ const Detail=({id})=>{
 const Ending=()=>{const f=useCurrentFrame(),p=ease(f,6,28);return <AbsoluteFill style={{background:'#0B0616',color:WHITE}}>
  <Bg img='poster.webp' f={f}/>
  <div style={{position:'absolute',top:300,left:32,right:32,textAlign:'center',opacity:p,transform:`translateY(${(1-p)*70}px)`}}>
-   <Type size={100}>QUAL DETALHE</Type>
-   <Type size={130} color={ORANGE}>VOCÊ NÃO</Type>
-   <Type size={118}>TINHA VISTO?</Type>
+   <Type size={100}>QUAL REFERÊNCIA</Type>
+   <Type size={130} color={ORANGE}>VOCÊ NUNCA</Type>
+   <Type size={118}>PERCEBEU?</Type>
    <div style={{marginTop:80}}><Type size={61} color={PINK}>COMENTA AÍ!</Type></div>
  </div>
- <div style={{position:'absolute',bottom:100,left:30,right:30,font:'bold 18px Arial',letterSpacing:1,textAlign:'center',color:'#f1cedf'}}>FRAMES DO TRAILER 2 © ROCKSTAR GAMES</div>
+ <div style={{position:'absolute',bottom:100,left:30,right:30,font:'bold 18px Arial',letterSpacing:1,textAlign:'center',color:'#f1cedf'}}>FRAMES DO TRAILERS © ROCKSTAR GAMES</div>
  <Bar frame={f} total={150}/>
  </AbsoluteFill>};
 const Video=()=> <AbsoluteFill style={{background:'#070511'}}>

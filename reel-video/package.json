@@ -1,0 +1,12 @@
+{
+  "name": "gta6-countdown-reel",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "remotion": "4.0.543",
+    "@remotion/cli": "4.0.543",
+    "react": "19.1.1",
+    "react-dom": "19.1.1"
+  }
+}

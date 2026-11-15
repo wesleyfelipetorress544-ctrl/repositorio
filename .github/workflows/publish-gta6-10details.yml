@@ -1,0 +1,29 @@
+name: Publish GTA VI 10 Details video download
+on:
+  push:
+    branches: [gta6-trailer-10-detalhes]
+    paths: ['.github/workflows/publish-gta6-10details.yml']
+  pull_request:
+    branches: [main]
+    paths: ['.github/workflows/publish-gta6-10details.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download completed Remotion MP4 from verified artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p output
+          gh run download 43757459061 --repo ${{ github.repository }} --name gta6-10-detalhes-mp4 --dir output
+          test -s output/gta6-10-detalhes-trailer.mp4
+          ls -lh output
+      - name: Upload direct MP4 as unique GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create gta6-10-detalhes-final-20261115 output/gta6-10-detalhes-trailer.mp4 --repo ${{ github.repository }} --target gta6-trailer-10-detalhes --title 'GTA VI - 10 detalhes escondidos no Trailer 2' --notes 'MP4 final de 30 segundos, vertical, 60 FPS, com narracao PT-BR, fonte Pricedown e imagens reais do trailer.'

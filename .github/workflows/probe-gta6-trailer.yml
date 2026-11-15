@@ -1,0 +1,16 @@
+name: Probe GTA VI trailer reference frames
+on:
+  push:
+    branches: [gta6-trailer-10-detalhes]
+    paths: ['detail-video/probe.py', '.github/workflows/probe-gta6-trailer.yml']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check frame image sources
+        working-directory: detail-video
+        run: python probe.py

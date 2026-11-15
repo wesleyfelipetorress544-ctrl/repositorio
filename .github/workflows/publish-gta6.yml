@@ -28,4 +28,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create gta6-xbox-ps5-precos-2026 release/gta6-valor-minimo.mp4 --repo ${{ github.repository }} --target gta6-video-remotion --title 'GTA VI - Xbox Series S vs PS5 Digital' --notes 'Video GTA VI PS5 e Xbox: fotos reais dos consoles e comparativo de preços. Remotion 30 segundos, 60 FPS. Trilha instrumental original.'
+          if gh release view gta6-xbox-ps5-precos-2026 --repo ${{ github.repository }} >/dev/null 2>&1; then
+            gh release upload gta6-xbox-ps5-precos-2026 release/gta6-valor-minimo.mp4 --repo ${{ github.repository }} --clobber
+          else
+            gh release create gta6-xbox-ps5-precos-2026 release/gta6-valor-minimo.mp4 --repo ${{ github.repository }} --target gta6-video-remotion --title 'GTA VI - Xbox Series S vs PS5 Digital' --notes 'Video GTA VI PS5 e Xbox: fotos reais dos consoles e comparativo de preços. Remotion 30 segundos, 60 FPS. Trilha instrumental original.'
+          fi

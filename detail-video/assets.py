@@ -16,16 +16,11 @@ for which in (1,2):
 # Frame target, from indexed fan analysis of the original Rockstar videos. The
 # commentary distinguishes interpretation from visually verified imagery.
 shots=[
- (2,33.0,"Iguana wooden ornament wearing Tommy's shirt"),
- (2,126.0,"Red Dead presidents on banknotes at nightclub"),
- (2,129.0,"Phil's Ammu-Nation on TV"),
- (2,18.0,"Jason and the Vice City V-Rock callbacks"),
- (2,11.3,"Just fixing some leaks after 2022 leaks"),
- (2,60.0,"Let Freedom Reign shirt outside prison"),
- (2,45.0,"Miami metro and hidden transit behind police"),
- (1,32.0,"Ocean View Hotel from original Vice City"),
- (1,76.0,"Red Dead Online outlaw poster/sticker on shop door"),
- (1,76.0,"Petty Forever sticker and Tom Petty tribute on shop door"),
+ (2,33.0,"Iguana painting in shop with shirt resembling Tommy Vercetti"),
+ (2,127.0,"Hardin and Waxman RDR2 presidents printed on GTA VI club banknotes"),
+ (2,134.0,"Phil's Ammu-Nation advert with mullet presenter"),
+ (1,77.0,"Petty Forever memorial sticker on store door"),
+ (2,11.3,"Jason fixing the roof leaks, possible nod to GTA VI 2022 leaks"),
 ]
 for i,(which,sec,label) in enumerate(shots):
  url,pairs=pages[which]
@@ -37,4 +32,4 @@ for i,(which,sec,label) in enumerate(shots):
  print(f"{i+1}: trailer={which} frame={nearest[0]} caption={label} bytes={len(data)}",flush=True)
 poster=ROOT/"poster.webp"
 poster.write_bytes(fetch(urllib.parse.urljoin(pages[2][0],"/trailers/trailer2/poster.webp")))
-print("All 10 verified-source frames downloaded",flush=True)
+print("Five source-specific trailer frames downloaded",flush=True)

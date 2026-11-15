@@ -5,6 +5,8 @@ on:
     paths:
       - 'gta6-launch/**'
       - '.github/workflows/gta6-release-video.yml'
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 permissions:
   contents: write

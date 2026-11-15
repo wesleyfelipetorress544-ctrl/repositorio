@@ -77,7 +77,7 @@ for i,(src,subject) in corrections.items():
  assert result.returncode==0, result.stderr[-400:]
  image=P/f"scene{i}.jpg"
  dims=run("ffprobe","-v","error","-select_streams","v:0","-show_entries","stream=width,height","-of","csv=p=0",str(image))
- assert dims.returncode==0 and "x" in dims.stdout, f"Image decode failed for {subject}: {dims.stdout}"
+ assert dims.returncode==0 and len(dims.stdout.strip().split(","))==2, f"Image decode failed for {subject}: {dims.stdout}"
  print(f"CORRECTED IMAGE {i}: {subject}, dimensions={dims.stdout.strip()} bytes={image.stat().st_size} source={src}",flush=True)
 
 (P/"poster.webp").write_bytes(fetch(urllib.parse.urljoin(pages[2][0],"/trailers/trailer2/poster.webp")))

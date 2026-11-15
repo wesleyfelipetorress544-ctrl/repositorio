@@ -33,3 +33,27 @@ for i,(which,sec,label) in enumerate(shots):
 poster=ROOT/"poster.webp"
 poster.write_bytes(fetch(urllib.parse.urljoin(pages[2][0],"/trailers/trailer2/poster.webp")))
 print("Five source-specific trailer frames downloaded",flush=True)
+
+# Dedicated closeups when available: real GTA VI screenshots, not AI-generated images.
+# Also prepare a focus still for each item so the Remotion close-up transition
+# always shows exactly the referenced game's own image.
+import subprocess
+closeups={
+  1:"https://rockstarintel.com/wp-content/uploads/2025/05/Vice_City_07-Copy.jpg",
+  2:"https://image.thenerdstash.com/2025/05/phil-gta.jpg",
+}
+for i in range(5):
+    target=ROOT/f"close{i}.jpg"
+    if i in closeups:
+        try:
+            data=fetch(closeups[i])
+            if len(data)>4000:
+                temp=ROOT/f"extra{i}.dat";temp.write_bytes(data)
+                subprocess.run(["ffmpeg","-y","-loglevel","error","-i",str(temp),"-frames:v","1",str(target)],check=True)
+                temp.unlink()
+                print("Specialized real-photo closeup",i,len(data),flush=True)
+                continue
+        except Exception as e:
+            print("Closeup source unavailable; using official trailer frame",i,str(e)[:160],flush=True)
+    subprocess.run(["ffmpeg","-y","-loglevel","error","-i",str(ROOT/f"scene{i}.webp"),"-frames:v","1",str(target)],check=True)
+    print("Closeup from actual trailer frame",i,flush=True)

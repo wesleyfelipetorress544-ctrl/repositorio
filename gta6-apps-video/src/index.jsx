@@ -65,7 +65,7 @@ const End=()=>{const f=useCurrentFrame(),v=ease(f,6,30);return <AbsoluteFill sty
  <Font size={105}>QUAL DESSES</Font><Font size={112} style={{color:'#FF8BCD'}}>VOCÊ QUER</Font><Font size={122}>TESTAR?</Font>
  <div style={{marginTop:80,font:'900 33px Arial',color:'#FFB9E3'}}>COMENTA AÍ!</div>
  </div>
- <div style={{position:'absolute',bottom:120,left:30,right:30,textAlign:'center',font:'bold 16px Arial',color:'#FBC5DE',letterSpacing:1}}>NOMES CONFORME POST DE REFERÊNCIA · FUNÇÕES NÃO CONFIRMADAS</div>
+
  </AbsoluteFill>};
 const Video=()=> <AbsoluteFill style={{background:'#10061c'}}>
  <style>{`@font-face{font-family:Pricedown;src:url('${staticFile('pricedown.otf')}') format('opentype');font-display:block}`}</style>

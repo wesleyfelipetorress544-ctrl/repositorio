@@ -41,6 +41,11 @@ jobs:
           unzip -po pricedown.zip 'Pricedown Bl.otf' > public/pricedown.otf
           test -s public/gta6.jpg
           test -s public/pricedown.otf
+          curl -fLsS --retry 2 --max-time 30 'https://images.tcdn.com.br/img/img_prod/621461/console_xbox_series_s_512gb_branco_3663_2_bc86f6d1e608c481d91624840b3458e7.jpg' -o public/xbox.png || curl -fLsS 'https://commons.wikimedia.org/wiki/Special:Redirect/file/Xbox_Series_S_with_controller.jpg?width=1000' -o public/xbox.png
+          curl -fLsS --retry 2 --max-time 30 'https://ennap.com/cdn/shop/files/Sony-PlayStation-5-Slim-Console-Digital-Edition_1.png?v=1757424007&width=1946' -o public/ps5.jpg || curl -fLsS 'https://commons.wikimedia.org/wiki/Special:Redirect/file/PS5DigitalEdition.png?width=800' -o public/ps5.jpg
+          test -s public/xbox.png
+          test -s public/ps5.jpg
+          file public/xbox.png public/ps5.jpg
       - name: Produce original instrumental soundtrack
         run: node music.cjs
       - name: Validate composition

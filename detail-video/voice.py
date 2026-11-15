@@ -3,18 +3,18 @@ from pathlib import Path
 import edge_tts
 OUT=Path('voiceparts');OUT.mkdir(exist_ok=True)
 moments=[
-(0.10,"Dez detalhes escondidos no trailer de GTA seis."),
-(2.60,"Um: Jason conserta o telhado."),
-(5.10,"Dois: Brian chega numa picape."),
-(7.60,"Três: placas indicam o aeroporto."),
-(10.10,"Quatro: academia na praia."),
-(12.60,"Cinco: uma blitz policial."),
-(15.10,"Seis: Lucia sai da prisão."),
-(17.60,"Sete: a marina do Brian."),
-(20.10,"Oito: selfie dentro da boate."),
-(22.60,"Nove: helicóptero no pântano."),
-(25.10,"Dez: ondas invadem a avenida."),
-(27.60,"Qual desses você nunca tinha visto?")
+(0.10,"Dez easter eggs de GTA seis descobertos pela comunidade."),
+(2.60,"Um: uma iguana com a camisa de Tommy."),
+(5.10,"Dois: presidentes de Red Dead no dinheiro."),
+(7.60,"Três: Phil Cassidy pode ter voltado."),
+(10.10,"Quatro: a velha rádio V-Rock."),
+(12.60,"Cinco: a piada com os vazamentos."),
+(15.10,"Seis: a camisa de liberdade de Jason."),
+(17.60,"Sete: o metrô escondido."),
+(20.10,"Oito: o hotel de Tommy em Vice City."),
+(22.60,"Nove: um procurado de Red Dead."),
+(25.10,"Dez: uma possível homenagem a Tom Petty."),
+(27.60,"Qual dessas referências você percebeu?")
 ]
 def run(*args):
  x=subprocess.run(args,check=False,capture_output=True,text=True)

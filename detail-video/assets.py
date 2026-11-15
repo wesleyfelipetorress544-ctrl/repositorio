@@ -60,6 +60,26 @@ for i,(n,t,label) in enumerate(shots):
  source=P/f"fallback{i}.webp";source.write_bytes(original)
  subprocess.run(["ffmpeg","-y","-loglevel","error","-i",str(source),"-frames:v","1","-q:v","2",str(out)],check=True)
  print("AUTHENTIC TRAILER STILL",i,best[0],out.stat().st_size,flush=True)
+# Two corrected reference photographs, visually verified before use:
+# scene1: Thaddeus Waxman's ten-dollar banknote floating under purple nightclub lighting.
+# scene2: Phil's Ammu-Nation presenter wearing PHIL'S shirt, in front of rifle wall.
+# Never silently substitute generic nightclub or store imagery.
+corrections={
+ 1:("https://rockstarintel.com/wp-content/uploads/2025/05/Vice_City_07-Copy.jpg","Waxman 10-dollar bill at nightclub"),
+ 2:("https://image.thenerdstash.com/2025/05/phil-gta.jpg","Phil's Ammu-Nation commercial presenter")
+}
+for i,(src,subject) in corrections.items():
+ data=fetch(src)
+ assert data[:3]==bytes([255,216,255]) or data[:4]==bytes([137,80,78,71]), f"Incorrect image response for {subject}"
+ temp=P/f"corrected{i}.source"
+ temp.write_bytes(data)
+ result=subprocess.run(["ffmpeg","-y","-loglevel","error","-i",str(temp),"-frames:v","1","-q:v","2",str(P/f"scene{i}.jpg")],capture_output=True,text=True)
+ assert result.returncode==0, result.stderr[-400:]
+ image=P/f"scene{i}.jpg"
+ dims=run("ffprobe","-v","error","-select_streams","v:0","-show_entries","stream=width,height","-of","csv=p=0",str(image))
+ assert dims.returncode==0 and "x" in dims.stdout, f"Image decode failed for {subject}: {dims.stdout}"
+ print(f"CORRECTED IMAGE {i}: {subject}, dimensions={dims.stdout.strip()} bytes={image.stat().st_size} source={src}",flush=True)
+
 (P/"poster.webp").write_bytes(fetch(urllib.parse.urljoin(pages[2][0],"/trailers/trailer2/poster.webp")))
 for i in range(5): assert (P/f"scene{i}.jpg").stat().st_size>2000
 print("Verified five scene images plus original Tommy reference",flush=True)

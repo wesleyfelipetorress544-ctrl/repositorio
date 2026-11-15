@@ -21,5 +21,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          DATA="$(base64 -w0 tiktok-reference/contact-sheet.jpg)"
-          gh api -X PUT "repos/${{ github.repository }}/contents/tiktok-reference/contact-sheet.jpg" -f message='Inspect nine reference frames' -f content="$DATA" -f branch=gta6-tiktok-photo-reference-2026
+          python - <<'PY'
+          import json,base64
+          data=base64.b64encode(open('tiktok-reference/contact-sheet.jpg','rb').read()).decode()
+          open('payload.json','w').write(json.dumps({'message':'Inspect nine reference frames','content':data,'branch':'gta6-tiktok-photo-reference-2026'}))
+          PY
+          gh api -X PUT "repos/${{ github.repository }}/contents/tiktok-reference/contact-sheet.jpg" --input payload.json

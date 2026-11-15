@@ -1,4 +1,4 @@
-name: Render GTA VI Easter Eggs with detailed narration v3
+name: Render GTA VI Easter Eggs HD corrected v4
 on:
   push:
     branches: [gta6-trailer-10-detalhes]
@@ -27,6 +27,7 @@ jobs:
           npm install --no-audit --no-fund
           sudo apt-get update -qq
           sudo apt-get install -y unzip ffmpeg
+          python -m pip install yt-dlp --break-system-packages
           npx remotion browser ensure
       - name: Obtain source frames from Rockstar Trailer 2
         run: |
@@ -35,7 +36,8 @@ jobs:
           curl -fLsS --retry 3 'https://dl.dafont.com/dl/?f=pricedown' -o pricedown.zip
           unzip -po pricedown.zip 'Pricedown Bl.otf' > public/pricedown.otf
           test -s public/pricedown.otf
-          for n in {0..4}; do test -s "public/scene$n.webp" || exit 1; done
+          for n in {0..4}; do test -s "public/scene$n.jpg" || exit 1; done
+          test -s public/tommy.jpg
           ls -lh public/
       - name: Create soundtrack and Brazilian narration
         run: |
@@ -46,24 +48,24 @@ jobs:
       - name: Check composition
         run: npx remotion compositions src/index.jsx
       - name: Render 70s Remotion MP4, 60FPS
-        run: npx remotion render src/index.jsx GTA6Detalhes gta6-5-easter-eggs-detalhados.mp4 --codec h264 --concurrency 2 --log error --timeout 180000
+        run: npx remotion render src/index.jsx GTA6Detalhes gta6-easter-eggs-fotos-corrigidas.mp4 --codec h264 --concurrency 2 --log error --timeout 180000
       - name: Verify video and voice audio
         run: |
-          ffprobe -v error -show_entries stream=codec_name,codec_type,width,height,r_frame_rate -of json gta6-5-easter-eggs-detalhados.mp4
-          ffprobe -v error -show_entries format=duration,size -of default=noprint_wrappers=1 gta6-5-easter-eggs-detalhados.mp4
-          ffmpeg -hide_banner -i gta6-5-easter-eggs-detalhados.mp4 -map 0:a:0 -af volumedetect -f null - 2>&1 | grep -E 'mean_volume|max_volume'
+          ffprobe -v error -show_entries stream=codec_name,codec_type,width,height,r_frame_rate -of json gta6-easter-eggs-fotos-corrigidas.mp4
+          ffprobe -v error -show_entries format=duration,size -of default=noprint_wrappers=1 gta6-easter-eggs-fotos-corrigidas.mp4
+          ffmpeg -hide_banner -i gta6-easter-eggs-fotos-corrigidas.mp4 -map 0:a:0 -af volumedetect -f null - 2>&1 | grep -E 'mean_volume|max_volume'
       - name: Upload MP4 file
         uses: actions/upload-artifact@v4
         with:
-          name: gta6-5-easter-eggs-detalhados-mp4
-          path: detail-video/gta6-5-easter-eggs-detalhados.mp4
+          name: gta6-easter-eggs-fotos-corrigidas-mp4
+          path: detail-video/gta6-easter-eggs-fotos-corrigidas.mp4
           retention-days: 7
       - name: Publish direct download
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if gh release view gta6-easter-eggs-explicados-2026 --repo ${{ github.repository }} >/dev/null 2>&1; then
-            gh release upload gta6-easter-eggs-explicados-2026 gta6-5-easter-eggs-detalhados.mp4 --repo ${{ github.repository }} --clobber
+          if gh release view gta6-easter-eggs-fotos-corrigidas-2026 --repo ${{ github.repository }} >/dev/null 2>&1; then
+            gh release upload gta6-easter-eggs-fotos-corrigidas-2026 gta6-easter-eggs-fotos-corrigidas.mp4 --repo ${{ github.repository }} --clobber
           else
-            gh release create gta6-easter-eggs-explicados-2026 gta6-5-easter-eggs-detalhados.mp4 --repo ${{ github.repository }} --target gta6-trailer-10-detalhes --title 'GTA VI: 5 Easter Eggs com explicacoes detalhadas' --notes 'Video Remotion de 70s em 9:16, 60 FPS, com Pricedown, narracao PT-BR, trilha original e quadros reais dos trailers 1 e 2, easter eggs discutidos pela comunidade. Montagem de analise; frames da Rockstar Games.'
+            gh release create gta6-easter-eggs-fotos-corrigidas-2026 gta6-easter-eggs-fotos-corrigidas.mp4 --repo ${{ github.repository }} --target gta6-trailer-10-detalhes --title 'GTA VI: 5 Easter Eggs fotos corrigidas' --notes 'Video Remotion atualizado de 70s em 9:16, imagens sem ampliacoes e comparacao com Tommy Vercetti original, 60 FPS, com Pricedown, narracao PT-BR, trilha original e quadros reais dos trailers 1 e 2, easter eggs discutidos pela comunidade. Montagem de analise; frames da Rockstar Games.'
           fi

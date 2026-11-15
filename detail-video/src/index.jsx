@@ -23,7 +23,7 @@ const Bg=({img,f})=><AbsoluteFill style={{overflow:'hidden',background:'#08060F'
  <Img src={staticFile(img)} style={{width:'100%',height:'100%',objectFit:'cover',filter:'blur(35px) brightness(.28) saturate(1.35)',transform:`scale(${1.7+f*.00012})`}}/>
  <AbsoluteFill style={{background:'linear-gradient(180deg,rgba(8,6,19,.42),rgba(8,5,19,.73) 54%,rgba(5,4,14,.98))'}}/>
  <AbsoluteFill style={{background:`radial-gradient(ellipse at ${60+Math.sin(f/40)*20}% 25%,rgba(247,114,185,.20),transparent 65%)`}}/>
-</Absolute>;
+</AbsoluteFill>;
 const Bar=({frame,total})=><div style={{position:'absolute',bottom:0,left:0,right:0,height:9,background:'rgba(255,255,255,.13)'}}>
  <div style={{height:'100%',width:`${100*Math.min(1,frame/total)}%`,background:'linear-gradient(90deg,#FFB96C,#F574B7,#AF7FF8)',boxShadow:'0 0 25px #EF7ECF'}}/>
 </div>;

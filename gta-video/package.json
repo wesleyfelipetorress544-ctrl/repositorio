@@ -1,0 +1,15 @@
+{
+  "name": "gta6-valor-minimo",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "render": "remotion render src/index.jsx GTA6ValorMinimo gta6-valor-minimo.mp4 --codec h264 --concurrency 2 --log verbose"
+  },
+  "dependencies": {
+    "remotion": "4.0.543",
+    "@remotion/cli": "4.0.543",
+    "react": "19.1.1",
+    "react-dom": "19.1.1"
+  }
+}

@@ -44,8 +44,11 @@ const Detail=({id})=>{
    <T size={d.name.length>19?64:74}>{d.name}</T>
   </div>
   <div style={{position:'absolute',left:30,right:30,top:275,height:440,borderRadius:24,overflow:'hidden',boxShadow:'0 25px 65px #000d',border:'2px solid #f8a2db66'}}>
-    <Img src={staticFile(frame)} style={{width:'100%',height:'100%',objectFit:'cover',objectPosition:d.position,transform:`scale(${1.03+f*.00015+zoom*.22})`,filter:'contrast(1.12) saturate(1.2)'}}/>
-    <div style={{position:'absolute',bottom:12,left:12,background:'#09040dcf',padding:'10px 15px',borderRadius:7,font:'bold 16px Arial',letterSpacing:1}}>CENA ORIGINAL</div>
+    <Img src={staticFile(frame)} style={{width:'100%',height:'100%',objectFit:'cover',objectPosition:d.position,transform:`scale(${1.03+f*.00015})`,filter:'contrast(1.12) saturate(1.2)'}}/>
+    <div style={{position:'absolute',inset:0,opacity:ease(f,265,330),background:'#0d0916'}}>
+      <Img src={staticFile(`close${id}.jpg`)} style={{width:'100%',height:'100%',objectFit:id===1||id===2?'contain':'cover',objectPosition:d.focus,transform:`scale(${id===1||id===2?1.12:1.95+Math.max(0,f-330)*.0002})`,filter:'contrast(1.16) saturate(1.16)'}}/>
+    </div>
+    <div style={{position:'absolute',bottom:12,left:12,background:'#09040dcf',padding:'10px 15px',borderRadius:7,font:'bold 16px Arial',letterSpacing:1}}>{f<310?'CENA ORIGINAL':'DETALHE AMPLIADO'}</div>
   </div>
   <div style={{position:'absolute',top:762,left:35,right:35,opacity:ease(f,55,88)}}>
     <div style={{color:ORANGE,textAlign:'center',fontFamily:'Pricedown',fontSize:43,marginBottom:15}}>{d.short}</div>

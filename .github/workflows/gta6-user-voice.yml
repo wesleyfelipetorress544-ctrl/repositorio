@@ -1,0 +1,75 @@
+name: GTA VI - Add supplied narration MP3
+on:
+  push:
+    branches: [gta6-video-remotion]
+    paths:
+      - '.github/workflows/gta6-user-voice.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/gta6-user-voice.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+jobs:
+  mix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout source assets
+        uses: actions/checkout@v4
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+      - name: Fetch last approved Remotion video
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p gta-video
+          gh run download 43744333182 --repo ${{ github.repository }} --name gta6-valor-minimo-mp4 --dir gta-video
+          mv gta-video/gta6-valor-minimo.mp4 gta-video/source.mp4
+          test -s gta-video/source.mp4
+          test -s gta-video/voice-upload.mp3
+      - name: Check supplied MP3 and prepare foreground voice
+        working-directory: gta-video
+        run: |
+          set -euo pipefail
+          ffprobe -v error -show_entries format=duration:format_tags=title -of default=noprint_wrappers=1 voice-upload.mp3
+          DURATION="$(ffprobe -v error -show_entries format=duration -of csv=p=0 voice-upload.mp3)"
+          # Fit the supplied speech into the unchanged 30-second short, but only if necessary.
+          TEMPO="$(awk -v d="$DURATION" 'BEGIN { if (d > 29.65) printf "%.5f", d / 29.65; else printf "1.00000" }')"
+          echo "Input MP3 duration: $DURATION seconds; tempo factor: $TEMPO"
+          ffmpeg -hide_banner -y -loglevel error -i voice-upload.mp3 \
+            -af "atempo=$TEMPO,loudnorm=I=-15:TP=-2:LRA=8,apad=whole_dur=30,atrim=duration=30" \
+            -ar 48000 -ac 2 voice_prepared.wav
+      - name: Add user's actual voice to original video, music kept quietly
+        working-directory: gta-video
+        run: |
+          ffmpeg -hide_banner -y -loglevel error \
+            -i source.mp4 -i voice_prepared.wav \
+            -filter_complex "[0:a]volume=0.11,aformat=channel_layouts=stereo[music];[1:a]volume=1.30,aformat=channel_layouts=stereo[voice];[music][voice]amix=inputs=2:duration=first:normalize=0,alimiter=limit=0.92,atrim=duration=30[aout]" \
+            -map 0:v:0 -map '[aout]' -c:v copy -c:a aac -b:a 192k \
+            -t 30 -movflags +faststart gta6-valor-minimo-com-sua-voz.mp4
+      - name: Validate narrated file and actual audio signal
+        working-directory: gta-video
+        run: |
+          test -s gta6-valor-minimo-com-sua-voz.mp4
+          ffprobe -v error -show_entries format=duration,size -of default=nw=1 gta6-valor-minimo-com-sua-voz.mp4
+          ffmpeg -hide_banner -i gta6-valor-minimo-com-sua-voz.mp4 -map 0:a -af volumedetect -f null - 2>&1 | grep -E 'mean_volume|max_volume'
+      - name: Upload MP4
+        uses: actions/upload-artifact@v4
+        with:
+          name: gta6-com-a-narracao-enviada
+          path: gta-video/gta6-valor-minimo-com-sua-voz.mp4
+          retention-days: 7
+      - name: Publish direct download without changing old videos
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view gta6-narracao-enviada-2026 --repo ${{ github.repository }} >/dev/null 2>&1; then
+            gh release upload gta6-narracao-enviada-2026 gta-video/gta6-valor-minimo-com-sua-voz.mp4 --repo ${{ github.repository }} --clobber
+          else
+            gh release create gta6-narracao-enviada-2026 gta-video/gta6-valor-minimo-com-sua-voz.mp4 --repo ${{ github.repository }} --target gta6-video-remotion --title 'GTA VI - video com audio enviado' --notes 'Versao de 30 segundos com a gravacao de voz fornecida pelo usuario, sem mudar as imagens, legendas ou animacoes do video Remotion.'
+          fi

@@ -6,7 +6,7 @@ const CL={extrapolateLeft:'clamp',extrapolateRight:'clamp'};
 const lerp=(f,start,end)=>interpolate(f,[start,end],[0,1],CL);
 const ease=(f,a,b)=>Easing.out(Easing.cubic)(lerp(f,a,b));
 const details=[
- {name:'A CAMISA DE TOMMY',short:'A IGUANA NA LOJA',label:'TRAILER 2  ·  0:33',desc:'Quando Jason bate no atendente, uma iguana decorativa aparece atrás do balcão. A estampa azul lembra a camisa de Tommy Vercetti, protagonista de Vice City.',status:'REFERÊNCIA SUGERIDA PELOS FÃS',focus:'73% 42%',position:'65% center'},
+ {name:'A CAMISA DE TOMMY',short:'A IGUANA NA LOJA',label:'TRAILER 2  ·  0:33',desc:'Quando Jason bate no atendente, uma iguana decorativa aparece atrás do balcão. Compare com a camisa azul original de Tommy Vercetti, mostrada ao lado.',status:'REFERÊNCIA SUGERIDA PELOS FÃS',focus:'73% 42%',position:'65% center'},
  {name:'RED DEAD NO DINHEIRO',short:'QUEM ESTÁ NAS NOTAS?',label:'TRAILER 2  ·  2:07',desc:'No dinheiro espalhado pela boate, fãs reconheceram Hardin e Waxman: presidentes fictícios mencionados em Red Dead Redemption 2. É um crossover visual, não prova de universo compartilhado.',status:'REFERÊNCIA VISUAL',focus:'50% 46%',position:'50% center'},
  {name:'PHIL CASSIDY?',short:'O COMERCIAL ESCONDIDO',label:'TRAILER 2  ·  2:14',desc:'Uma TV mostra a Phil’s Ammu-Nation. O nome remete ao traficante de armas Phil Cassidy, de Vice City, mas Rockstar não confirmou que o apresentador seja ele.',status:'IDENTIDADE NÃO CONFIRMADA',focus:'49% 49%',position:'50% center'},
  {name:'PETTY FOREVER',short:'HOMENAGEM NA PORTA',label:'TRAILER 1  ·  1:17',desc:'Na porta da loja assaltada por Lucia e Jason há um adesivo Petty Forever. Ele homenageia Tom Petty, artista da música usada no primeiro trailer.',status:'REFERÊNCIA MUSICAL',focus:'38% 44%',position:'47% center'},
@@ -24,17 +24,9 @@ const Intro=()=>{const f=useCurrentFrame();const k=ease(f,8,40);return <Absolute
   <div style={{font:'bold 23px Arial',marginTop:55,color:'#f2cce2'}}>PAUSE O TRAILER E CONFIRA</div>
  </div><Progress f={f} total={300}/></AbsoluteFill>};
 
-const HighlightBox=({f,focus})=>{
- const p=ease(f,255,310);
- return <div style={{opacity:p,position:'absolute',top:440,left:28,right:28,height:310,borderRadius:23,overflow:'hidden',border:'3px solid #ffb66d',background:'#100b1b',boxShadow:'0 15px 60px #000b'}}>
-   <Img src={staticFile(focus)} style={{width:'100%',height:'100%',objectFit:'cover',transform:`scale(${1.68+Math.max(0,f-290)*.0005})`}}/>
-   <div style={{position:'absolute',top:12,left:12,padding:'8px 16px',background:'#000a',font:'bold 17px Arial',color:ORANGE,letterSpacing:2}}>ZOOM DO TRAILER</div>
- </div>;
-};
-
 const Detail=({id})=>{
- const f=useCurrentFrame(),d=details[id],enter=ease(f,4,38),zoom=ease(f,190,285);
- const frame=`scene${id}.webp`;
+ const f=useCurrentFrame(),d=details[id],enter=ease(f,4,38);
+ const frame=`scene${id}.jpg`;
  return <AbsoluteFill style={{color:WHITE}}><Fg frame={f} image={frame}/>
   <div style={{position:'absolute',top:74,left:35,right:35,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
     <div style={{font:'bold 20px Arial',letterSpacing:3,color:'#f8c6e5'}}>{d.label}</div>
@@ -43,12 +35,17 @@ const Detail=({id})=>{
   <div style={{position:'absolute',top:159,left:30,right:30,textAlign:'center',opacity:enter,transform:`translateY(${(1-enter)*80}px)`}}>
    <T size={d.name.length>19?64:74}>{d.name}</T>
   </div>
-  <div style={{position:'absolute',left:30,right:30,top:275,height:440,borderRadius:24,overflow:'hidden',boxShadow:'0 25px 65px #000d',border:'2px solid #f8a2db66'}}>
-    <Img src={staticFile(frame)} style={{width:'100%',height:'100%',objectFit:'cover',objectPosition:d.position,transform:`scale(${1.03+f*.00015})`,filter:'contrast(1.12) saturate(1.2)'}}/>
-    <div style={{position:'absolute',inset:0,opacity:ease(f,265,330),background:'#0d0916'}}>
-      <Img src={staticFile(`close${id}.jpg`)} style={{width:'100%',height:'100%',objectFit:id===1||id===2?'contain':'cover',objectPosition:d.focus,transform:`scale(${id===1||id===2?1.12:1.95+Math.max(0,f-330)*.0002})`,filter:'contrast(1.16) saturate(1.16)'}}/>
-    </div>
-    <div style={{position:'absolute',bottom:12,left:12,background:'#09040dcf',padding:'10px 15px',borderRadius:7,font:'bold 16px Arial',letterSpacing:1}}>{f<310?'CENA ORIGINAL':'DETALHE AMPLIADO'}</div>
+  <div style={{position:'absolute',left:30,right:30,top:275,height:440,borderRadius:24,overflow:'hidden',boxShadow:'0 25px 65px #000d',border:'2px solid #f8a2db66',background:'#100914'}}>
+    {id===0 ? <div style={{display:'flex',width:'100%',height:'100%',gap:8,padding:9,boxSizing:'border-box'}}>
+      <div style={{flex:1,minWidth:0,display:'flex',flexDirection:'column',gap:8}}>
+        <div style={{font:'bold 16px Arial',letterSpacing:1,color:ORANGE,textAlign:'center'}}>TRAILER 2</div>
+        <Img src={staticFile('scene0.jpg')} style={{width:'100%',height:'calc(100% - 27px)',objectFit:'contain',background:'#050509',borderRadius:8}}/>
+      </div>
+      <div style={{flex:1,minWidth:0,display:'flex',flexDirection:'column',gap:8}}>
+        <div style={{font:'bold 16px Arial',letterSpacing:1,color:ORANGE,textAlign:'center'}}>TOMMY ORIGINAL</div>
+        <Img src={staticFile('tommy.jpg')} style={{width:'100%',height:'calc(100% - 27px)',objectFit:'contain',background:'#050509',borderRadius:8}}/>
+      </div>
+    </div> : <Img src={staticFile(frame)} style={{width:'100%',height:'100%',objectFit:'contain',background:'#080611',filter:'contrast(1.04) saturate(1.06)'}}/>}
   </div>
   <div style={{position:'absolute',top:762,left:35,right:35,opacity:ease(f,55,88)}}>
     <div style={{color:ORANGE,textAlign:'center',fontFamily:'Pricedown',fontSize:43,marginBottom:15}}>{d.short}</div>

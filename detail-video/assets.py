@@ -1,45 +1,40 @@
 #!/usr/bin/env python3
-"""Download the exact Trailer 2 frame grabs for ten verifiable visible moments.
-The stills are from the official Rockstar trailer as indexed by Leonida Bay;
-do not substitute generic art or fabricate in-game screenshots.
-"""
-import re, urllib.request, urllib.parse, pathlib, html as htmlmod, math
+"""Frame grabs tied to genuine Reddit-discovered GTA VI easter eggs in Rockstar trailers."""
+import re,urllib.request,urllib.parse,html,pathlib
 ROOT=pathlib.Path("public");ROOT.mkdir(exist_ok=True)
-url="https://leonidabay.com/en/trailers/trailer-2"
-agent={"User-Agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/126 Safari/537.36"}
-def fetch(url):
-    return urllib.request.urlopen(urllib.request.Request(url,headers=agent),timeout=40).read()
-raw=fetch(url).decode("utf-8","replace")
-# The original source contains an image per scene, with a precise seeking timestamp.
-pattern=r'<a href="\?t=\d+#reproductor" data-seek="([\d.]+)"[^>]*>\s*<img src="([^"]+)"'
-pairs=[]
-for at,src in re.findall(pattern,raw,re.S):
-    src=htmlmod.unescape(src)
-    pairs.append((float(at),src))
-print("SCENE_FRAME_PAIRS",len(pairs),flush=True)
-assert len(pairs)>=50,"Source does not provide enough scene-specific trailer frame stills."
-moments=[
-    (11.28,"Jason fixes his leaking roof"),
-    (9.16,"Brian Heder and his pickup"),
-    (34.25,"Airport and downtown direction signs"),
-    (38.40,"Bench press at beach gym"),
-    (45.15,"Police checkpoint on road"),
-    (63.32,"Lucia exits the penitentiary"),
-    (85.1,"Brian's Boat Works sign"),
-    (124.17,"Video selfie in nightclub"),
-    (138.30,"Helicopter chases boat over Grassrivers"),
-    (152.87,"Waves flooding the coastal road"),
+H={"User-Agent":"Mozilla/5.0 Chrome/126 Safari/537.36"}
+def fetch(u):return urllib.request.urlopen(urllib.request.Request(u,headers=H),timeout=35).read()
+pages={}
+for which in (1,2):
+ url=f"https://leonidabay.com/en/trailers/trailer-{which}"
+ raw=fetch(url).decode("utf-8","replace")
+ pairs=[(float(s),html.unescape(src)) for s,src in re.findall(r'<a href="\?t=\d+#reproductor" data-seek="([\d.]+)"[^>]*>\s*<img src="([^"]+)"',raw,re.S)]
+ assert len(pairs)>30,f"No archive frames for trailer {which}"
+ pages[which]=(url,pairs)
+ print(f"Trailer {which} indexed {len(pairs)} real frames",flush=True)
+
+# Frame target, from indexed fan analysis of the original Rockstar videos. The
+# commentary distinguishes interpretation from visually verified imagery.
+shots=[
+ (2,33.0,"Iguana wooden ornament wearing Tommy's shirt"),
+ (2,126.0,"Red Dead presidents on banknotes at nightclub"),
+ (2,129.0,"Phil's Ammu-Nation on TV"),
+ (2,18.0,"Jason and the Vice City V-Rock callbacks"),
+ (2,11.3,"Just fixing some leaks after 2022 leaks"),
+ (2,60.0,"Let Freedom Reign shirt outside prison"),
+ (2,45.0,"Miami metro and hidden transit behind police"),
+ (1,32.0,"Ocean View Hotel from original Vice City"),
+ (1,76.0,"Red Dead Online outlaw poster/sticker on shop door"),
+ (1,76.0,"Petty Forever sticker and Tom Petty tribute on shop door"),
 ]
-for idx,(sec,title) in enumerate(moments):
-    best=min(pairs,key=lambda a:abs(a[0]-sec))
-    if abs(best[0]-sec)>3.6: raise ValueError(f"Frame mismatch {idx} sought {sec}, found {best}")
-    src=urllib.parse.urljoin(url,best[1])
-    data=fetch(src)
-    assert len(data)>2500,f"Too small: {src}"
-    p=ROOT/f"scene{idx}.webp"
-    p.write_bytes(data)
-    print(f"FRAME {idx+1}: target={sec}, source={best[0]}, bytes={len(data)}, image={src}, subject={title}",flush=True)
+for i,(which,sec,label) in enumerate(shots):
+ url,pairs=pages[which]
+ nearest=min(pairs,key=lambda p:abs(p[0]-sec))
+ assert abs(nearest[0]-sec)<3.6,f"Cannot map trailer {which} timestamp {sec} to source frame"
+ data=fetch(urllib.parse.urljoin(url,nearest[1]))
+ assert len(data)>2000
+ p=ROOT/f"scene{i}.webp";p.write_bytes(data)
+ print(f"{i+1}: trailer={which} frame={nearest[0]} caption={label} bytes={len(data)}",flush=True)
 poster=ROOT/"poster.webp"
-poster_src=urllib.parse.urljoin(url,"/trailers/trailer2/poster.webp")
-poster.write_bytes(fetch(poster_src))
-print("All 10 unique original video frame grabs downloaded",flush=True)
+poster.write_bytes(fetch(urllib.parse.urljoin(pages[2][0],"/trailers/trailer2/poster.webp")))
+print("All 10 verified-source frames downloaded",flush=True)

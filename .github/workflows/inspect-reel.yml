@@ -1,0 +1,27 @@
+name: Inspect user Reel style
+on:
+  push:
+    branches: [gta6-reel-reference-2026]
+    paths: ['reel-video/reference.mp4','.github/workflows/inspect-reel.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect timing, visuals and audio
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+          ffprobe -hide_banner -v error -show_entries format=duration,size:stream=width,height,r_frame_rate,codec_type -of json reel-video/reference.mp4
+          ffmpeg -y -loglevel error -i reel-video/reference.mp4 -vf "fps=1/2,scale=220:-1,tile=4x4:padding=6:margin=6" -frames:v 1 -q:v 3 reel-video/contact-sheet.jpg
+          ffmpeg -y -loglevel error -i reel-video/reference.mp4 -af volumedetect -f null - 2>&1 | grep -E "mean_volume|max_volume" || true
+          file reel-video/contact-sheet.jpg
+      - name: Save visual reference contact sheet
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          B64="$(base64 -w0 reel-video/contact-sheet.jpg)"
+          gh api -X PUT "repos/${{ github.repository }}/contents/reel-video/contact-sheet.jpg" -f message='Add visual inspection frames from uploaded reel' -f content="$B64" -f branch='gta6-reel-reference-2026'

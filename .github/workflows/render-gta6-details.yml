@@ -1,4 +1,4 @@
-name: Render 10 GTA VI Trailer 2 details
+name: Render 10 GTA VI Trailer 2 details (corrected)
 on:
   push:
     branches: [gta6-trailer-10-detalhes]

@@ -6,6 +6,9 @@ on:
     paths:
       - 'gta-video/**'
       - '.github/workflows/render-gta6.yml'
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 jobs:
   render:

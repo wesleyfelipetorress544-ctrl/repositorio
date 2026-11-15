@@ -1,0 +1,69 @@
+name: Render GTA VI 4-day countdown Reel with Remotion
+on:
+  push:
+    branches: [gta6-reel-reference-2026]
+    paths:
+      - 'reel-video/src/**'
+      - 'reel-video/music.cjs'
+      - 'reel-video/package.json'
+      - '.github/workflows/render-countdown-reel.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'reel-video/src/**'
+      - '.github/workflows/render-countdown-reel.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    defaults:
+      run:
+        working-directory: reel-video
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Remotion renderer
+        run: |
+          npm install --no-audit --no-fund
+          sudo apt-get update -qq
+          sudo apt-get install -y unzip ffmpeg
+          npx remotion browser ensure
+      - name: Add official Rockstar images and original Pricedown font
+        run: |
+          mkdir -p public
+          curl -fLsS --retry 3 'https://media-rockstargames-com.akamaized.net/rockstargames-newsite/img/global/downloads/wallpapers/games/vi/Jason_and_Lucia_01/Jason_and_Lucia_01_landscape.jpg' -o public/art1.jpg
+          cp public/art1.jpg public/art2.jpg
+          cp public/art1.jpg public/art3.jpg
+          curl -fLsS --retry 3 'https://dl.dafont.com/dl/?f=pricedown' -o pricedown.zip
+          unzip -po pricedown.zip 'Pricedown Bl.otf' > public/pricedown.otf
+          file public/art1.jpg
+          test -s public/pricedown.otf
+      - name: Create music and impacts
+        run: node music.cjs
+      - name: Check video
+        run: npx remotion compositions src/index.jsx
+      - name: Render 11s vertical MP4 at 60 FPS
+        run: npx remotion render src/index.jsx GTAVI4Dias gta-vi-faltam-4-dias.mp4 --codec h264 --concurrency 2 --log error --timeout 180000
+      - name: Verify MP4
+        run: |
+          ffprobe -v error -show_entries stream=codec_type,codec_name,width,height,r_frame_rate -of json gta-vi-faltam-4-dias.mp4
+          test -s gta-vi-faltam-4-dias.mp4
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gta-vi-faltam-4-dias-mp4
+          path: reel-video/gta-vi-faltam-4-dias.mp4
+          retention-days: 7
+      - name: Publish final MP4
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view gta6-faltam-4-dias-reel-2026 --repo ${{ github.repository }} >/dev/null 2>&1; then
+            gh release upload gta6-faltam-4-dias-reel-2026 gta-vi-faltam-4-dias.mp4 --repo ${{ github.repository }} --clobber
+          else
+            gh release create gta6-faltam-4-dias-reel-2026 gta-vi-faltam-4-dias.mp4 --repo ${{ github.repository }} --target gta6-reel-reference-2026 --title 'GTA VI - Faltam 4 dias' --notes 'Reel 11 segundos, Remotion, 720x1280, 60FPS, trilha original, imagens da Rockstar e fonte Pricedown. Estilo inspirado no video de referencia enviado.'
+          fi

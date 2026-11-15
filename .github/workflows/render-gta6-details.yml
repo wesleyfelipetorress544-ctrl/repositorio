@@ -1,4 +1,4 @@
-name: Render 10 GTA VI Trailer 2 details (corrected)
+name: Render GTA VI Reddit Easter Eggs v2
 on:
   push:
     branches: [gta6-trailer-10-detalhes]
@@ -62,8 +62,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if gh release view gta6-10-detalhes-trailer-2026 --repo ${{ github.repository }} >/dev/null 2>&1; then
-            gh release upload gta6-10-detalhes-trailer-2026 gta6-10-detalhes-trailer.mp4 --repo ${{ github.repository }} --clobber
+          if gh release view gta6-reddit-easter-eggs-2026 --repo ${{ github.repository }} >/dev/null 2>&1; then
+            gh release upload gta6-reddit-easter-eggs-2026 gta6-10-detalhes-trailer.mp4 --repo ${{ github.repository }} --clobber
           else
-            gh release create gta6-10-detalhes-trailer-2026 gta6-10-detalhes-trailer.mp4 --repo ${{ github.repository }} --target gta6-trailer-10-detalhes --title 'GTA VI: 10 detalhes do trailer 2' --notes 'Video Remotion de 30s em 9:16, 60 FPS, com Pricedown, narracao PT-BR, trilha original e quadros reais extraidos do Trailer 2. Montagem de analise; frames da Rockstar Games.'
+            gh release create gta6-reddit-easter-eggs-2026 gta6-10-detalhes-trailer.mp4 --repo ${{ github.repository }} --target gta6-trailer-10-detalhes --title 'GTA VI: 10 Easter Eggs descobertos no Reddit' --notes 'Video Remotion de 30s em 9:16, 60 FPS, com Pricedown, narracao PT-BR, trilha original e quadros reais dos trailers 1 e 2, easter eggs discutidos pela comunidade. Montagem de analise; frames da Rockstar Games.'
           fi

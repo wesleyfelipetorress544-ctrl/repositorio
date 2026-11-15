@@ -14,7 +14,7 @@ pages={}
 for n in (1,2):
  url=f"https://leonidabay.com/en/trailers/trailer-{n}"
  raw=fetch(url).decode("utf-8","replace")
- matches=[(float(t),html.unescape(src)) for t,src in re.findall(r'<a href="\\?t=\\d+#reproductor" data-seek="([\\d.]+)"[^>]*>\\s*<img src="([^"]+)"',raw,re.S)]
+ matches=[(float(t),html.unescape(src)) for t,src in re.findall(r'<a href="\?t=\d+#reproductor" data-seek="([\d.]+)"[^>]*>\s*<img src="([^"]+)"',raw,re.S)]
  assert len(matches)>=25, f"Indexed real trailer frames unavailable for trailer {n}"
  pages[n]=(url,matches)
  print("TRAILER INDEX",n,len(matches),flush=True)

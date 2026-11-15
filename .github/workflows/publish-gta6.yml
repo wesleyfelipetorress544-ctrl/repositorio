@@ -4,6 +4,7 @@ on:
     branches: [gta6-video-remotion]
     paths:
       - '.github/workflows/publish-gta6.yml'
+      - 'gta-video/narration.py'
   pull_request:
     branches: [main]
     paths:
@@ -44,6 +45,12 @@ jobs:
         with:
           name: gta6-valor-minimo-narrado
           path: gta-video/gta6-valor-minimo-narrado.mp4
+          retention-days: 7
+      - name: Upload isolated voice for quality check
+        uses: actions/upload-artifact@v4
+        with:
+          name: gta6-voz-isolada
+          path: gta-video/voz_gta6_isolada.mp3
           retention-days: 7
       - name: Publish new narrated MP4 download (old file unchanged)
         env:

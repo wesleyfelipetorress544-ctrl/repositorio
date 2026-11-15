@@ -1,0 +1,31 @@
+name: Publish GTA VI MP4 direct download
+on:
+  push:
+    branches: [gta6-video-remotion]
+    paths:
+      - '.github/workflows/publish-gta6.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/publish-gta6.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch already-rendered MP4 artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p release
+          gh run download 43742379502 --repo ${{ github.repository }} --name gta6-valor-minimo-mp4 --dir release
+          ls -lah release/
+          test -s release/gta6-valor-minimo.mp4
+      - name: Publish direct MP4 download as GitHub release asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create gta6-valor-minimo-2026 release/gta6-valor-minimo.mp4 --repo ${{ github.repository }} --target gta6-video-remotion --title 'GTA VI - valor minimo para jogar' --notes 'Video vertical de 30 segundos, 60 FPS, editado e renderizado com Remotion. Valores estimados consultados em novembro de 2026.'

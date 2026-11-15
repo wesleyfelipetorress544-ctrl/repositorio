@@ -1,91 +1,72 @@
 import React from 'react';
 import {registerRoot,Composition,AbsoluteFill,Img,Audio,Sequence,staticFile,useCurrentFrame,interpolate,Easing} from 'remotion';
 
-const F='Pricedown',ORANGE='#FFAF69',PINK='#F878B6',PURPLE='#B474EA',WHITE='#FFF7F7';
-const options={extrapolateLeft:'clamp',extrapolateRight:'clamp'};
-const lerp=(f,a,b)=>interpolate(f,[a,b],[0,1],options);
+const W=720,H=1280,WHITE='#fff8f5',ORANGE='#ffb86a',PINK='#fa81b5';
+const CL={extrapolateLeft:'clamp',extrapolateRight:'clamp'};
+const lerp=(f,start,end)=>interpolate(f,[start,end],[0,1],CL);
 const ease=(f,a,b)=>Easing.out(Easing.cubic)(lerp(f,a,b));
-const data=[
- {title:'A CAMISA DE TOMMY',small:'Iguana atrás do balcão • referência dos fãs',time:'T2 · 0:33',focus:70,kind:'REFERÊNCIA'},
- {title:'RED DEAD NAS NOTAS',small:'Hardin e Waxman aparecem no dinheiro',time:'T2 · 2:07',focus:50,kind:'EASTER EGG'},
- {title:'PHIL CASSIDY?',small:'Comercial de Phil\'s Ammu-Nation',time:'T2 · 2:09',focus:55,kind:'TEORIA'},
- {title:'V-ROCK DE VOLTA?',small:'Jason usa referência à rádio de Vice City',time:'T2 · CENA',focus:50,kind:'REFERÊNCIA'},
- {title:'A PIADA DOS LEAKS',small:'Jason diz que está consertando vazamentos',time:'T2 · 0:11',focus:50,kind:'TEORIA'},
- {title:'LIBERDADE, LUCIA!',small:'Camiseta “Let Freedom Reign” na prisão',time:'T2 · 1:00',focus:50,kind:'IRONIA'},
- {title:'METRÔ ESCONDIDO',small:'Linha elevada atrás da blitz policial',time:'T2 · 0:45',focus:50,kind:'DETALHE'},
- {title:'HOTEL OCEAN VIEW',small:'O clássico refúgio de Tommy em Vice City',time:'T1 · 0:32',focus:50,kind:'REFERÊNCIA'},
- {title:'RED DEAD NO GTA?',small:'Adesivo lembra o fora da lei Everett Morgan',time:'T1 · 1:16',focus:50,kind:'REFERÊNCIA'},
- {title:'HOMENAGEM A PETTY?',small:'Adesivo visto perto do fim do Trailer 1',time:'T1 · 1:16',focus:50,kind:'TEORIA'},
+const details=[
+ {name:'A CAMISA DE TOMMY',short:'A IGUANA NA LOJA',label:'TRAILER 2  ·  0:33',desc:'Quando Jason bate no atendente, uma iguana decorativa aparece atrás do balcão. A estampa azul lembra a camisa de Tommy Vercetti, protagonista de Vice City.',status:'REFERÊNCIA SUGERIDA PELOS FÃS',focus:'73% 42%',position:'65% center'},
+ {name:'RED DEAD NO DINHEIRO',short:'QUEM ESTÁ NAS NOTAS?',label:'TRAILER 2  ·  2:07',desc:'No dinheiro espalhado pela boate, fãs reconheceram Hardin e Waxman: presidentes fictícios mencionados em Red Dead Redemption 2. É um crossover visual, não prova de universo compartilhado.',status:'REFERÊNCIA VISUAL',focus:'50% 46%',position:'50% center'},
+ {name:'PHIL CASSIDY?',short:'O COMERCIAL ESCONDIDO',label:'TRAILER 2  ·  2:14',desc:'Uma TV mostra a Phil’s Ammu-Nation. O nome remete ao traficante de armas Phil Cassidy, de Vice City, mas Rockstar não confirmou que o apresentador seja ele.',status:'IDENTIDADE NÃO CONFIRMADA',focus:'49% 49%',position:'50% center'},
+ {name:'PETTY FOREVER',short:'HOMENAGEM NA PORTA',label:'TRAILER 1  ·  1:17',desc:'Na porta da loja assaltada por Lucia e Jason há um adesivo Petty Forever. Ele homenageia Tom Petty, artista da música usada no primeiro trailer.',status:'REFERÊNCIA MUSICAL',focus:'38% 44%',position:'47% center'},
+ {name:'JUST FIXING SOME LEAKS',short:'A PIADA DA ROCKSTAR?',label:'TRAILER 2  ·  0:11',desc:'Jason diz que está consertando vazamentos no telhado. Fãs interpretam a frase como uma indireta ao enorme vazamento de GTA VI em 2022. É uma teoria.',status:'TEORIA DA COMUNIDADE',focus:'52% 40%',position:'50% center'}
 ];
-
-const Type=({children,size=84,color=WHITE,style={}})=><div style={{fontFamily:F,fontSize:size,color,lineHeight:1.01,textShadow:'0 5px 0 rgba(0,0,0,.52)',...style}}>{children}</div>;
-const Bg=({img,f})=><AbsoluteFill style={{overflow:'hidden',background:'#08060F'}}>
- <Img src={staticFile(img)} style={{width:'100%',height:'100%',objectFit:'cover',filter:'blur(35px) brightness(.28) saturate(1.35)',transform:`scale(${1.7+f*.00012})`}}/>
- <AbsoluteFill style={{background:'linear-gradient(180deg,rgba(8,6,19,.42),rgba(8,5,19,.73) 54%,rgba(5,4,14,.98))'}}/>
- <AbsoluteFill style={{background:`radial-gradient(ellipse at ${60+Math.sin(f/40)*20}% 25%,rgba(247,114,185,.20),transparent 65%)`}}/>
+const T=({children,size=63,color=WHITE,style={}})=><div style={{fontFamily:'Pricedown',fontSize:size,lineHeight:1.03,color,letterSpacing:0,textShadow:'0 5px 0 rgba(0,0,0,.48)',...style}}>{children}</div>;
+const Fg=({image,frame,dim=.55})=><AbsoluteFill style={{background:'#080613',overflow:'hidden'}}>
+  <Img src={staticFile(image)} style={{width:'100%',height:'100%',objectFit:'cover',filter:`blur(26px) brightness(${dim}) saturate(1.5)`,transform:`scale(${1.9+frame*.00014})`}}/>
+  <AbsoluteFill style={{background:'linear-gradient(180deg,rgba(7,1,15,.66),rgba(7,1,15,.78) 56%,#080513)'}}/>
 </AbsoluteFill>;
-const Bar=({frame,total})=><div style={{position:'absolute',bottom:0,left:0,right:0,height:9,background:'rgba(255,255,255,.13)'}}>
- <div style={{height:'100%',width:`${100*Math.min(1,frame/total)}%`,background:'linear-gradient(90deg,#FFB96C,#F574B7,#AF7FF8)',boxShadow:'0 0 25px #EF7ECF'}}/>
-</div>;
-const Label=({children})=><div style={{font:'800 20px Arial',letterSpacing:4,color:'#F4D5E7'}}>{children}</div>;
-const Pulse=({f})=><div style={{position:'absolute',left:45,right:45,bottom:145,height:4,borderRadius:8,background:'linear-gradient(90deg,#ffb76a,#ed7fce,#9e80fa)',transform:`scaleX(${.82+Math.sin(f/22)*.14})`}}/>;
-const Intro=()=>{const f=useCurrentFrame(),p=ease(f,6,34);return <AbsoluteFill style={{background:'#0c0717',color:WHITE}}>
- <Bg img='poster.webp' f={f}/>
- <div style={{position:'absolute',top:105,left:44,right:44}}><Label>ROCKSTAR GAMES · TRAILER 2</Label></div>
- <div style={{position:'absolute',top:330,left:32,right:32,textAlign:'center',transform:`translateY(${(1-p)*100}px) scale(${.85+.15*p})`,opacity:p}}>
- <Type size={110}>10 EASTER EGGS</Type><Type size={128} color={ORANGE}>QUE OS FÃS</Type><Type size={113}>ENCONTRARAM</Type>
- <div style={{marginTop:35,font:'bold 29px Arial',letterSpacing:3}}>GTA VI</div>
- </div>
- <div style={{position:'absolute',top:920,left:40,right:40,font:'bold 22px Arial',textAlign:'center',letterSpacing:1,color:'#FFE7EF'}}>REFERÊNCIAS E TEORIAS DOS TRAILERS 1 E 2</div>
- <Pulse f={f}/><Bar frame={f} total={150}/>
- </AbsoluteFill>};
+const Progress=({f,total})=><div style={{position:'absolute',bottom:0,left:0,right:0,height:8,background:'#ffffff26'}}><div style={{height:'100%',width:`${Math.min(100,100*f/total)}%`,background:'linear-gradient(90deg,#f9ab6d,#f570bd,#ac79fa)'}}/></div>;
+const Intro=()=>{const f=useCurrentFrame();const k=ease(f,8,40);return <AbsoluteFill style={{color:WHITE}}><Fg image='poster.webp' frame={f} dim={.68}/>
+ <div style={{position:'absolute',top:300,left:30,right:30,textAlign:'center',opacity:k,transform:`translateY(${(1-k)*60}px)`}}>
+  <T size={103}>5 SEGREDOS</T><T size={126} color={ORANGE}>DE GTA VI</T><T size={63}>QUE O REDDIT ENCONTROU</T>
+  <div style={{font:'bold 23px Arial',marginTop:55,color:'#f2cce2'}}>PAUSE O TRAILER E CONFIRA</div>
+ </div><Progress f={f} total={300}/></AbsoluteFill>};
+
+const HighlightBox=({f,focus})=>{
+ const p=ease(f,255,310);
+ return <div style={{opacity:p,position:'absolute',top:440,left:28,right:28,height:310,borderRadius:23,overflow:'hidden',border:'3px solid #ffb66d',background:'#100b1b',boxShadow:'0 15px 60px #000b'}}>
+   <Img src={staticFile(focus)} style={{width:'100%',height:'100%',objectFit:'cover',transform:`scale(${1.68+Math.max(0,f-290)*.0005})`}}/>
+   <div style={{position:'absolute',top:12,left:12,padding:'8px 16px',background:'#000a',font:'bold 17px Arial',color:ORANGE,letterSpacing:2}}>ZOOM DO TRAILER</div>
+ </div>;
+};
+
 const Detail=({id})=>{
- const f=useCurrentFrame(),it=data[id],reveal=ease(f,0,22),late=ease(f,21,42),photo=ease(f,0,18);
- const borderFade=interpolate(f,[0,4,12,136,149],[0,.85,1,1,.9],options);
- const movement=1.12+f*.00045;
- return <AbsoluteFill style={{background:'#0A0615',color:WHITE}}>
-   <Bg img={`scene${id}.webp`} f={f}/>
-   <div style={{position:'absolute',top:90,left:40,right:40,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-     <Label>{it.kind}</Label><div style={{fontFamily:F,fontSize:37,color:'#FFC487'}}>{it.time}</div>
-   </div>
-   <div style={{position:'absolute',top:178,left:37,right:37,fontFamily:F,fontSize:130,lineHeight:1,color:'#FFAB6D',opacity:reveal,transform:`translateY(${(1-reveal)*50}px)`}}>
-     {String(id+1).padStart(2,'0')} <span style={{fontSize:50,color:'rgba(255,255,255,.8)'}}>/ 10</span>
-   </div>
-   <div style={{position:'absolute',top:315,left:25,right:25,height:500,borderRadius:22,overflow:'hidden',border:`3px solid rgba(255,177,112,${borderFade})`,boxShadow:'0 24px 50px rgba(0,0,0,.75),0 0 42px rgba(244,92,167,.20)',opacity:photo,transform:`translateY(${(1-photo)*35}px)`}}>
-      <Img src={staticFile(`scene${id}.webp`)} style={{width:'100%',height:'100%',objectFit:'cover',objectPosition:`${it.focus}% center`,filter:'contrast(1.1) saturate(1.17)',transform:`scale(${movement}) translateX(${Math.sin(f/30)*.4}%)`}}/>
-      <div style={{position:'absolute',top:20,left:20,width:65,height:65,borderLeft:'5px solid #fff7',borderTop:'5px solid #fff7'}}/>
-      <div style={{position:'absolute',right:20,bottom:20,width:65,height:65,borderRight:'5px solid #fff7',borderBottom:'5px solid #fff7'}}/>
-      <div style={{position:'absolute',right:18,top:18,background:'#0009',padding:'7px 12px',font:'bold 16px Arial',letterSpacing:1,borderRadius:5}}>FRAME REAL</div>
-   </div>
-   <div style={{position:'absolute',top:866,left:34,right:34,opacity:late,transform:`translateY(${(1-late)*65}px)`}}>
-      <Type size={id===8?67:id===2?70:72} color={WHITE} style={{textAlign:'center'}}>{it.title}</Type>
-      <div style={{marginTop:24,textAlign:'center',font:'600 29px Arial',color:'#FBCBE3'}}>{it.small}</div>
-   </div>
-   <Pulse f={f}/>
-   <div style={{position:'absolute',bottom:80,left:38,right:38,display:'flex',justifyContent:'space-between',font:'bold 15px Arial',letterSpacing:3,color:'#F8BFD9'}}>
-    <span>GTA VI</span><span>ROCKSTAR GAMES</span>
-   </div>
-   <Bar frame={f} total={150}/>
-   <AbsoluteFill style={{background:'#fff',opacity:interpolate(f,[0,2,9],[.22,.17,0],options),pointerEvents:'none'}}/>
+ const f=useCurrentFrame(),d=details[id],enter=ease(f,4,38),zoom=ease(f,190,285);
+ const frame=`scene${id}.webp`;
+ return <AbsoluteFill style={{color:WHITE}}><Fg frame={f} image={frame}/>
+  <div style={{position:'absolute',top:74,left:35,right:35,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+    <div style={{font:'bold 20px Arial',letterSpacing:3,color:'#f8c6e5'}}>{d.label}</div>
+    <div style={{fontFamily:'Pricedown',fontSize:41,color:ORANGE}}>{id+1} / 5</div>
+  </div>
+  <div style={{position:'absolute',top:159,left:30,right:30,textAlign:'center',opacity:enter,transform:`translateY(${(1-enter)*80}px)`}}>
+   <T size={d.name.length>19?64:74}>{d.name}</T>
+  </div>
+  <div style={{position:'absolute',left:30,right:30,top:275,height:440,borderRadius:24,overflow:'hidden',boxShadow:'0 25px 65px #000d',border:'2px solid #f8a2db66'}}>
+    <Img src={staticFile(frame)} style={{width:'100%',height:'100%',objectFit:'cover',objectPosition:d.position,transform:`scale(${1.03+f*.00015+zoom*.22})`,filter:'contrast(1.12) saturate(1.2)'}}/>
+    <div style={{position:'absolute',bottom:12,left:12,background:'#09040dcf',padding:'10px 15px',borderRadius:7,font:'bold 16px Arial',letterSpacing:1}}>CENA ORIGINAL</div>
+  </div>
+  <div style={{position:'absolute',top:762,left:35,right:35,opacity:ease(f,55,88)}}>
+    <div style={{color:ORANGE,textAlign:'center',fontFamily:'Pricedown',fontSize:43,marginBottom:15}}>{d.short}</div>
+    <div style={{font:'500 27px/1.33 Arial',textAlign:'center',color:'#fff1f7'}}>{d.desc}</div>
+  </div>
+  <div style={{position:'absolute',bottom:110,left:35,right:35,textAlign:'center',font:'bold 19px Arial',letterSpacing:2,color:'#ffc988'}}>{d.status}</div>
+  <div style={{position:'absolute',right:35,top:704,width:88,height:6,background:ORANGE,borderRadius:15,opacity:.9}}/>
+  <Progress f={f} total={720}/>
  </AbsoluteFill>;
 };
-const Ending=()=>{const f=useCurrentFrame(),p=ease(f,6,28);return <AbsoluteFill style={{background:'#0B0616',color:WHITE}}>
- <Bg img='poster.webp' f={f}/>
- <div style={{position:'absolute',top:300,left:32,right:32,textAlign:'center',opacity:p,transform:`translateY(${(1-p)*70}px)`}}>
-   <Type size={100}>QUAL REFERÊNCIA</Type>
-   <Type size={130} color={ORANGE}>VOCÊ NUNCA</Type>
-   <Type size={118}>PERCEBEU?</Type>
-   <div style={{marginTop:80}}><Type size={61} color={PINK}>COMENTA AÍ!</Type></div>
- </div>
- <div style={{position:'absolute',bottom:100,left:30,right:30,font:'bold 18px Arial',letterSpacing:1,textAlign:'center',color:'#f1cedf'}}>FRAMES DO TRAILERS © ROCKSTAR GAMES</div>
- <Bar frame={f} total={150}/>
- </AbsoluteFill>};
-const Video=()=> <AbsoluteFill style={{background:'#070511'}}>
+const Outro=()=>{const f=useCurrentFrame(),k=ease(f,10,47);return <AbsoluteFill style={{color:WHITE}}><Fg image='poster.webp' frame={f}/>
+ <div style={{position:'absolute',top:310,left:31,right:31,textAlign:'center',opacity:k,transform:`translateY(${(1-k)*65}px)`}}>
+  <T size={94}>QUAL SEGREDO</T><T size={108} color={ORANGE}>VOCÊ NÃO</T><T size={100}>CONHECIA?</T>
+  <div style={{font:'bold 28px Arial',marginTop:65,letterSpacing:3,color:'#ffd3e8'}}>COMENTA AÍ!</div>
+ </div><Progress f={f} total={300}/></AbsoluteFill>};
+const Video=()=> <AbsoluteFill style={{background:'#070513'}}>
  <style>{`@font-face{font-family:Pricedown;src:url('${staticFile('pricedown.otf')}') format('opentype');font-display:block}`}</style>
- <Audio src={staticFile('music.wav')} volume={.28}/>
- <Audio src={staticFile('voice.wav')} volume={1}/>
- <Sequence from={0} durationInFrames={150}><Intro/></Sequence>
- {data.map((_,i)=><Sequence key={i} from={150+i*150} durationInFrames={150}><Detail id={i}/></Sequence>)}
- <Sequence from={1650} durationInFrames={150}><Ending/></Sequence>
+ <Audio src={staticFile('music.wav')} volume={0.13}/>
+ <Audio src={staticFile('voice.wav')} volume={1.0}/>
+ <Sequence from={0} durationInFrames={300}><Intro/></Sequence>
+ {details.map((d,i)=><Sequence key={i} from={300+i*720} durationInFrames={720}><Detail id={i}/></Sequence>)}
+ <Sequence from={3900} durationInFrames={300}><Outro/></Sequence>
  </AbsoluteFill>;
-registerRoot(()=><Composition id='GTA6Detalhes' component={Video} fps={60} width={720} height={1280} durationInFrames={1800}/>);
+registerRoot(()=><Composition id='GTA6Detalhes' component={Video} fps={60} width={720} height={1280} durationInFrames={4200}/>);

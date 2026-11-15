@@ -1,0 +1,52 @@
+name: Render GTA VI price short
+on:
+  push:
+    branches:
+      - gta6-video-remotion
+    paths:
+      - 'gta-video/**'
+      - '.github/workflows/render-gta6.yml'
+  workflow_dispatch:
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: gta-video
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install packages
+        run: npm install --no-audit --no-fund
+      - name: Setup Chromium and FFmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y unzip ffmpeg
+          npx remotion browser ensure
+      - name: Fetch authentic official Rockstar art and Pricedown font
+        run: |
+          mkdir -p public
+          curl -fLsS --retry 3 'https://media-rockstargames-com.akamaized.net/rockstargames-newsite/img/global/downloads/wallpapers/games/vi/Jason_and_Lucia_01/Jason_and_Lucia_01_landscape.jpg' -o public/gta6.jpg
+          curl -fLsS --retry 3 'https://dl.dafont.com/dl/?f=pricedown' -o pricedown.zip
+          unzip -po pricedown.zip 'Pricedown Bl.otf' > public/pricedown.otf
+          test -s public/gta6.jpg
+          test -s public/pricedown.otf
+      - name: Produce original instrumental soundtrack
+        run: node music.cjs
+      - name: Validate composition
+        run: npx remotion compositions src/index.jsx
+      - name: Render final MP4 in Remotion
+        run: npx remotion render src/index.jsx GTA6ValorMinimo gta6-valor-minimo.mp4 --codec h264 --concurrency 2 --log error --timeout 180000
+      - name: Upload MP4
+        uses: actions/upload-artifact@v4
+        with:
+          name: gta6-valor-minimo-mp4
+          path: gta-video/gta6-valor-minimo.mp4
+          retention-days: 7

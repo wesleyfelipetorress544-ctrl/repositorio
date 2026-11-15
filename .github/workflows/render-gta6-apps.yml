@@ -1,4 +1,4 @@
-name: Render GTA VI mobile apps TikTok-style short
+name: Render GTA VI apps without disclaimer
 on:
   push:
     branches: [gta6-tiktok-photo-reference-2026]
@@ -63,8 +63,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if gh release view gta6-aplicativos-tiktok-2026 --repo ${{ github.repository }} >/dev/null 2>&1; then
-            gh release upload gta6-aplicativos-tiktok-2026 gta6-aplicativos-celular.mp4 --repo ${{ github.repository }} --clobber
+          if gh release view gta6-aplicativos-sem-observacao-2026 --repo ${{ github.repository }} >/dev/null 2>&1; then
+            gh release upload gta6-aplicativos-sem-observacao-2026 gta6-aplicativos-celular.mp4 --repo ${{ github.repository }} --clobber
           else
-            gh release create gta6-aplicativos-tiktok-2026 gta6-aplicativos-celular.mp4 --repo ${{ github.repository }} --target gta6-tiktok-photo-reference-2026 --title 'GTA VI - Aplicativos do celular' --notes 'Original Remotion animated explainer based on TikTok photo carousel, 40s vertical 60fps, Portuguese narration, original music. Names and descriptions come from a fan-made reference, not confirmed gameplay features.'
+            gh release create gta6-aplicativos-sem-observacao-2026 gta6-aplicativos-celular.mp4 --repo ${{ github.repository }} --target gta6-tiktok-photo-reference-2026 --title 'GTA VI - Aplicativos do celular' --notes 'Original Remotion animated explainer based on TikTok photo carousel, 40s vertical 60fps, Portuguese narration, original music. Names and descriptions come from a fan-made reference, not confirmed gameplay features.'
           fi

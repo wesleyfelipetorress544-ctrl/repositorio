@@ -1,4 +1,4 @@
-const fs=require('fs');const sr=44100,seconds=30,n=sr*seconds,b=Buffer.alloc(44+n*2);
+const fs=require('fs');const sr=44100,seconds=70,n=sr*seconds,b=Buffer.alloc(44+n*2);
 const bpm=136,beat=60/bpm;let seed=837;
 const noise=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return (seed/4294967296)*2-1;};
 const bass=[55,55,65.406,73.416,55,65.406,82.407,73.416];
@@ -17,4 +17,4 @@ for(let i=0;i<n;i++){
 }
 b.write('RIFF',0);b.writeUInt32LE(36+n*2,4);b.write('WAVEfmt ',8);b.writeUInt32LE(16,16);b.writeUInt16LE(1,20);b.writeUInt16LE(1,22);b.writeUInt32LE(sr,24);b.writeUInt32LE(sr*2,28);b.writeUInt16LE(2,32);b.writeUInt16LE(16,34);b.write('data',36);b.writeUInt32LE(n*2,40);
 fs.mkdirSync('public',{recursive:true});fs.writeFileSync('public/music.wav',b);
-console.log('Original 30s instrumental soundtrack generated.');
+console.log('Original 70s instrumental soundtrack generated.');

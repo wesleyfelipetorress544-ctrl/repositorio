@@ -6,7 +6,7 @@ import requests, re, html, subprocess
 P=Path("public");P.mkdir(exist_ok=True)
 # Each target is a distinct, real image; no unrelated fallback is permitted.
 photos=[
- ("city","https://leonidahub.org/en/gallery/lucia-and-a-cop-at-night"),
+ ("city","https://leonidahub.org/en/gallery/lucia-caminos-14"),
  ("night","https://leonidahub.org/en/gallery/vehiculos-vcpd-lowline-frame"),
  ("beach","https://leonidahub.org/en/gallery/vice-city-17"),
  ("birds","https://leonidahub.org/en/gallery/lucia-caminos-07"),

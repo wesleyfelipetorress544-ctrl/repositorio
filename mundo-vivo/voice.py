@@ -3,13 +3,13 @@ from pathlib import Path
 import edge_tts
 parts=Path("voice-parts");parts.mkdir(exist_ok=True)
 scenes=[
- (0.18,"GTA seis pode ter o mundo aberto mais vivo que a Rockstar já criou?"),
- (5.18,"Só de olhar Vice City, já dá pra notar trânsito, luzes e movimento por toda parte."),
- (10.18,"Nas praias, pessoas descansam, caminham e aproveitam o dia. Nada parece vazio."),
- (15.18,"E longe da cidade, os pântanos de Leonida mostram flamingos e outros animais."),
- (20.18,"No litoral, barcos e jet skis deixam até a água cheia de atividade."),
- (25.18,"Os trailers também mostram personagens e situações que dão personalidade a cada região."),
- (30.18,"Agora falta saber como tudo isso vai funcionar jogando. Será um novo padrão?")
+ (0.18,"A polícia de GTA seis pode ser muito mais intensa do que em GTA cinco."),
+ (5.18,"A gente já viu viaturas da polícia de Vice City circulando e entrando em perseguições."),
+ (10.18,"Em outra imagem, helicóptero, carros e barco cercam uma mansão."),
+ (15.18,"E tem até Lucia armada em um túnel, com uma viatura policial logo atrás."),
+ (20.18,"Em outra região, Jason aparece perto de barcos da polícia."),
+ (25.18,"Um vídeo oficial ainda mostra uma abordagem com policiais à paisana."),
+ (30.18,"Mas atenção: a inteligência artificial da polícia ainda precisa ser testada. O que você espera?")
 ]
 def run(*cmd):
  r=subprocess.run(cmd,text=True,capture_output=True)

@@ -3,13 +3,13 @@ from pathlib import Path
 import edge_tts
 parts=Path("voice-parts");parts.mkdir(exist_ok=True)
 scenes=[
- (0.18,"A polícia de GTA seis pode ser muito mais intensa do que em GTA cinco."),
- (5.18,"A gente já viu viaturas da polícia de Vice City circulando e entrando em perseguições."),
- (10.18,"Em outra imagem, helicóptero, carros e barco cercam uma mansão."),
- (15.18,"E tem até Lucia armada em um túnel, com uma viatura policial logo atrás."),
- (20.18,"Em outra região, Jason aparece perto de barcos da polícia."),
- (25.18,"Um vídeo oficial ainda mostra uma abordagem com policiais à paisana."),
- (30.18,"Mas atenção: a inteligência artificial da polícia ainda precisa ser testada. O que você espera?")
+ (0.18,"GTA seis trouxe de volta as seis estrelas, e a polícia agora consegue identificar você."),
+ (5.18,"No GTA cinco, o máximo era cinco estrelas. Agora, o sistema volta a ter seis."),
+ (10.18,"E o crime só chama a polícia se alguém presenciar ou se um alarme for acionado."),
+ (15.18,"Os policiais podem saber qual roupa você está usando."),
+ (20.18,"Eles também identificam seu carro. Trocar de veículo pode ajudar na fuga."),
+ (25.18,"Seu rosto e até o fato de Jason e Lucia estarem juntos viram pistas."),
+ (30.18,"Mudar de roupa ou se separar pode despistar a polícia. Você gostou dessa novidade?")
 ]
 def run(*cmd):
  r=subprocess.run(cmd,text=True,capture_output=True)

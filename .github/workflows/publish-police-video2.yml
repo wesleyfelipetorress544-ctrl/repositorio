@@ -1,0 +1,26 @@
+name: Publish GTA VI police video 2 MP4
+on:
+  push:
+    branches: [gta6-policia-video2-remotion]
+    paths: ['.github/workflows/publish-police-video2.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch verified completed police video
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p output
+          gh run download 43778004087 --repo ${{ github.repository }} --name gta6-policia-mais-intensa-mp4 --dir output
+          test -s output/gta6-policia-mais-intensa.mp4
+          ls -lh output/
+      - name: Publish independent release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create gta6-policia-video2-final-2026 output/gta6-policia-mais-intensa.mp4 --repo ${{ github.repository }} --target gta6-policia-video2-remotion --title 'GTA VI - Polícia mais intensa?' --notes 'Segundo short independente, 35 segundos, 720x1280, 60fps, narração brasileira, música original, fontes oficiais e imagens distintas do vídeo 1.'

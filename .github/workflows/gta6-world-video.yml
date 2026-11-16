@@ -1,7 +1,7 @@
-name: Render GTA VI vibrant open world short
+name: Render GTA VI police chase analysis video
 on:
   push:
-    branches: [gta6-mundo-vivo-remotion-2026]
+    branches: [gta6-policia-video2-remotion]
     paths:
       - 'mundo-vivo/**'
       - '.github/workflows/gta6-world-video.yml'
@@ -44,24 +44,24 @@ jobs:
       - name: Validate Remotion composition
         run: npx remotion compositions src/index.jsx
       - name: Export 35 second vertical 60 fps MP4
-        run: npx remotion render src/index.jsx GTAVIWorld gta6-mundo-mais-vivo.mp4 --codec h264 --concurrency 2 --log error --timeout 180000
+        run: npx remotion render src/index.jsx GTAVIWorld gta6-policia-mais-intensa.mp4 --codec h264 --concurrency 2 --log error --timeout 180000
       - name: Verify picture and spoken audio
         run: |
-          ffprobe -v error -show_entries format=duration,size:stream=codec_type,codec_name,width,height,r_frame_rate -of json gta6-mundo-mais-vivo.mp4
-          ffmpeg -hide_banner -i gta6-mundo-mais-vivo.mp4 -map 0:a:0 -af volumedetect -f null - 2>&1 | grep -E 'mean_volume|max_volume'
-          test -s gta6-mundo-mais-vivo.mp4
+          ffprobe -v error -show_entries format=duration,size:stream=codec_type,codec_name,width,height,r_frame_rate -of json gta6-policia-mais-intensa.mp4
+          ffmpeg -hide_banner -i gta6-policia-mais-intensa.mp4 -map 0:a:0 -af volumedetect -f null - 2>&1 | grep -E 'mean_volume|max_volume'
+          test -s gta6-policia-mais-intensa.mp4
       - name: Upload MP4
         uses: actions/upload-artifact@v4
         with:
-          name: gta6-mundo-mais-vivo-mp4
-          path: mundo-vivo/gta6-mundo-mais-vivo.mp4
+          name: gta6-policia-mais-intensa-mp4
+          path: mundo-vivo/gta6-policia-mais-intensa.mp4
           retention-days: 7
       - name: Publish direct video download
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if gh release view gta6-mundo-vivo-video-2026 --repo ${{ github.repository }} >/dev/null 2>&1; then
-            gh release upload gta6-mundo-vivo-video-2026 gta6-mundo-mais-vivo.mp4 --repo ${{ github.repository }} --clobber
+          if gh release view gta6-policia-video2-2026 --repo ${{ github.repository }} >/dev/null 2>&1; then
+            gh release upload gta6-policia-video2-2026 gta6-policia-mais-intensa.mp4 --repo ${{ github.repository }} --clobber
           else
-            gh release create gta6-mundo-vivo-video-2026 gta6-mundo-mais-vivo.mp4 --repo ${{ github.repository }} --target gta6-mundo-vivo-remotion-2026 --title 'GTA VI - O mundo aberto mais vivo?' --notes '35s vertical 60fps Remotion with real Rockstar GTA VI imagery, original music, Pricedown typography, synchronized Brazilian Portuguese narration. Observations are based on released materials; mechanics are not asserted.'
+            gh release create gta6-policia-video2-2026 gta6-policia-mais-intensa.mp4 --repo ${{ github.repository }} --target gta6-policia-video2-remotion --title 'GTA VI - A policia pode ser muito diferente?' --notes '35s vertical 60fps Remotion featuring verified police-focused GTA VI photos, original music, Pricedown typography, synchronized Brazilian Portuguese narration. Observations are based on released materials; mechanics are not asserted.'
           fi
